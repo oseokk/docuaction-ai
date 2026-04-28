@@ -1,8 +1,14 @@
 package com.docuaction.document;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +68,7 @@ class DocumentUploadIntegrationTest {
 			"file",
 			"bill.pdf",
 			"application/pdf",
-			"%PDF-1.4 sample".getBytes()
+			createPdfBytes("Electric bill amount 72300 due 2026-05-10")
 		);
 
 		String response = mockMvc.perform(multipart("/api/documents/upload")
@@ -92,12 +98,13 @@ class DocumentUploadIntegrationTest {
 	@Test
 	void uploadDocumentEventuallyStartsAnalysis() throws Exception {
 		String accessToken = signupAndLogin("analysis@example.com");
-		Long documentId = upload(accessToken, "analysis.pdf");
+		Long documentId = upload(accessToken, "analysis.pdf", "Analysis pipeline PDF text");
 
 		Document document = awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
 		AnalysisJob analysisJob = analysisJobRepository.findTopByDocumentIdOrderByCreatedAtDesc(documentId).orElseThrow();
 
 		assertThat(document.getAnalysisStatus()).isEqualTo(DocumentAnalysisStatus.NEEDS_REVIEW);
+		assertThat(document.getOcrText()).contains("Analysis pipeline PDF text");
 		assertThat(analysisJob.getStatus()).isEqualTo(AnalysisJobStatus.COMPLETED);
 	}
 
@@ -155,7 +162,7 @@ class DocumentUploadIntegrationTest {
 			"file",
 			"bill.pdf",
 			"application/pdf",
-			"%PDF-1.4 sample".getBytes()
+			createPdfBytes("Unauthorized PDF")
 		);
 
 		mockMvc.perform(multipart("/api/documents/upload").file(file))
@@ -211,8 +218,12 @@ class DocumentUploadIntegrationTest {
 	}
 
 	private Long upload(String accessToken, String fileName) throws Exception {
+		return upload(accessToken, fileName, "Sample PDF text");
+	}
+
+	private Long upload(String accessToken, String fileName, String text) throws Exception {
 		String contentType = fileName.endsWith(".png") ? "image/png" : "application/pdf";
-		byte[] content = fileName.endsWith(".png") ? new byte[] {1, 2, 3} : "%PDF-1.4 sample".getBytes();
+		byte[] content = fileName.endsWith(".png") ? new byte[] {1, 2, 3} : createPdfBytes(text);
 		MockMultipartFile file = new MockMultipartFile("file", fileName, contentType, content);
 
 		String response = mockMvc.perform(multipart("/api/documents/upload")
@@ -239,5 +250,26 @@ class DocumentUploadIntegrationTest {
 		}
 
 		return document;
+	}
+
+	private byte[] createPdfBytes(String text) throws Exception {
+		try (
+			PDDocument document = new PDDocument();
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream()
+		) {
+			PDPage page = new PDPage();
+			document.addPage(page);
+
+			try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+				contentStream.beginText();
+				contentStream.setFont(new PDType1Font(Standard14Fonts.FontName.HELVETICA), 12);
+				contentStream.newLineAtOffset(50, 700);
+				contentStream.showText(text);
+				contentStream.endText();
+			}
+
+			document.save(outputStream);
+			return outputStream.toByteArray();
+		}
 	}
 }

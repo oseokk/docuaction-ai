@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.docuaction.analysis.entity.AnalysisJob;
+import com.docuaction.analysis.ocr.TextExtractionException;
+import com.docuaction.analysis.ocr.TextExtractionService;
 import com.docuaction.analysis.repository.AnalysisJobRepository;
 import com.docuaction.document.entity.Document;
 import com.docuaction.document.entity.DocumentAnalysisStatus;
@@ -13,9 +15,14 @@ import com.docuaction.document.entity.DocumentAnalysisStatus;
 public class DocumentAnalysisAsyncService {
 
 	private final AnalysisJobRepository analysisJobRepository;
+	private final TextExtractionService textExtractionService;
 
-	public DocumentAnalysisAsyncService(AnalysisJobRepository analysisJobRepository) {
+	public DocumentAnalysisAsyncService(
+		AnalysisJobRepository analysisJobRepository,
+		TextExtractionService textExtractionService
+	) {
 		this.analysisJobRepository = analysisJobRepository;
+		this.textExtractionService = textExtractionService;
 	}
 
 	@Async
@@ -29,9 +36,15 @@ public class DocumentAnalysisAsyncService {
 			analysisJob.markProcessing();
 			document.markProcessing();
 
-			// OCR and AI integration will replace this stub in the next phase.
+			String ocrText = textExtractionService.extract(document);
+			document.updateOcrText(ocrText);
+
+			// AI classification and field extraction will replace this stub in the next phase.
 			document.markNeedsReview();
 			analysisJob.markCompleted();
+		} catch (TextExtractionException exception) {
+			document.markFailed(DocumentAnalysisStatus.OCR_FAILED);
+			analysisJob.markFailed("OCR_FAILED", exception.getMessage());
 		} catch (RuntimeException exception) {
 			document.markFailed(DocumentAnalysisStatus.FAILED);
 			analysisJob.markFailed("ANALYSIS_FAILED", exception.getMessage());
@@ -39,4 +52,3 @@ public class DocumentAnalysisAsyncService {
 		}
 	}
 }
-

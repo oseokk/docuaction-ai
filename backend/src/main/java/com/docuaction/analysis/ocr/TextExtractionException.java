@@ -1,0 +1,9 @@
+package com.docuaction.analysis.ocr;
+
+public class TextExtractionException extends RuntimeException {
+
+	public TextExtractionException(String message, Throwable cause) {
+		super(message, cause);
+	}
+}
+

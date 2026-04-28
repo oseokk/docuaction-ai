@@ -13,6 +13,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -56,6 +57,10 @@ public class Document {
 
 	@Column(nullable = false, length = 255)
 	private String title;
+
+	@Lob
+	@Column(columnDefinition = "TEXT")
+	private String ocrText;
 
 	@Column(nullable = false)
 	private boolean deleted;
@@ -141,6 +146,10 @@ public class Document {
 		return title;
 	}
 
+	public String getOcrText() {
+		return ocrText;
+	}
+
 	public boolean isDeleted() {
 		return deleted;
 	}
@@ -163,5 +172,9 @@ public class Document {
 
 	public void markFailed(DocumentAnalysisStatus failedStatus) {
 		this.analysisStatus = failedStatus;
+	}
+
+	public void updateOcrText(String ocrText) {
+		this.ocrText = ocrText;
 	}
 }
