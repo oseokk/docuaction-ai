@@ -233,6 +233,62 @@ class DocumentUploadIntegrationTest {
 	}
 
 	@Test
+	void completeActionChangesStatusAndRemovesFromUpcoming() throws Exception {
+		String accessToken = signupAndLogin("complete-action@example.com");
+		Long documentId = upload(accessToken, "complete-action.pdf", "Electric bill amount 72300 due 2026-05-10");
+		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+		reviewBill(accessToken, documentId);
+
+		String detailResponse = mockMvc.perform(get("/api/documents/{documentId}", documentId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString();
+		Long actionId = objectMapper.readTree(detailResponse).path("data").path("actions").get(0).path("actionId").asLong();
+
+		mockMvc.perform(post("/api/actions/{actionId}/complete", actionId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.actionId").value(actionId))
+			.andExpect(jsonPath("$.data.status").value("COMPLETED"));
+
+		mockMvc.perform(get("/api/actions/upcoming")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.length()").value(0));
+
+		mockMvc.perform(get("/api/documents/{documentId}", documentId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.actions[0].status").value("COMPLETED"));
+	}
+
+	@Test
+	void completeOtherUsersActionReturnsNotFound() throws Exception {
+		String ownerToken = signupAndLogin("action-owner@example.com");
+		String otherToken = signupAndLogin("action-other@example.com");
+		Long documentId = upload(ownerToken, "owner-action.pdf", "Electric bill amount 72300 due 2026-05-10");
+		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+		reviewBill(ownerToken, documentId);
+
+		String detailResponse = mockMvc.perform(get("/api/documents/{documentId}", documentId)
+				.header("Authorization", "Bearer " + ownerToken))
+			.andExpect(status().isOk())
+			.andReturn()
+			.getResponse()
+			.getContentAsString();
+		Long actionId = objectMapper.readTree(detailResponse).path("data").path("actions").get(0).path("actionId").asLong();
+
+		mockMvc.perform(post("/api/actions/{actionId}/complete", actionId)
+				.header("Authorization", "Bearer " + otherToken))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error.code").value("COMMON_404"));
+	}
+
+	@Test
 	void reviewOtherUsersDocumentReturnsNotFound() throws Exception {
 		String ownerToken = signupAndLogin("review-owner@example.com");
 		String otherToken = signupAndLogin("review-other@example.com");
@@ -334,6 +390,34 @@ class DocumentUploadIntegrationTest {
 			.getContentAsString();
 
 		return objectMapper.readTree(response).path("data").path("documentId").asLong();
+	}
+
+	private void reviewBill(String accessToken, Long documentId) throws Exception {
+		mockMvc.perform(post("/api/documents/{documentId}/review", documentId)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "documentType": "BILL",
+					  "title": "전기요금 고지서",
+					  "summary": "검수 완료",
+					  "fields": [
+					    {
+					      "key": "amount",
+					      "label": "납부금액",
+					      "value": "72300",
+					      "type": "NUMBER"
+					    },
+					    {
+					      "key": "dueDate",
+					      "label": "납부기한",
+					      "value": "2026-05-10",
+					      "type": "DATE"
+					    }
+					  ]
+					}
+					"""))
+			.andExpect(status().isOk());
 	}
 
 	private Document awaitDocumentStatus(Long documentId, DocumentAnalysisStatus expectedStatus) throws Exception {

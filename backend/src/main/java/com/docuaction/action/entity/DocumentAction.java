@@ -120,5 +120,8 @@ public class DocumentAction {
 	public DocumentActionStatus getStatus() {
 		return status;
 	}
-}
 
+	public void complete() {
+		this.status = DocumentActionStatus.COMPLETED;
+	}
+}
