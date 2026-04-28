@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.docuaction.analysis.service.AnalysisJobService;
 import com.docuaction.common.exception.BusinessException;
 import com.docuaction.common.response.ErrorCode;
 import com.docuaction.document.dto.DocumentDetailResponse;
@@ -25,15 +26,18 @@ public class DocumentService {
 	private final DocumentRepository documentRepository;
 	private final UserRepository userRepository;
 	private final FileStorageService fileStorageService;
+	private final AnalysisJobService analysisJobService;
 
 	public DocumentService(
 		DocumentRepository documentRepository,
 		UserRepository userRepository,
-		FileStorageService fileStorageService
+		FileStorageService fileStorageService,
+		AnalysisJobService analysisJobService
 	) {
 		this.documentRepository = documentRepository;
 		this.userRepository = userRepository;
 		this.fileStorageService = fileStorageService;
+		this.analysisJobService = analysisJobService;
 	}
 
 	@Transactional
@@ -51,6 +55,7 @@ public class DocumentService {
 			storedFile.mimeType()
 		);
 		Document savedDocument = documentRepository.save(document);
+		analysisJobService.createAndStartAfterCommit(savedDocument, user);
 
 		return new DocumentUploadResponse(
 			savedDocument.getId(),

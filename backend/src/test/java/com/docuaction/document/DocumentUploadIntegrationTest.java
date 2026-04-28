@@ -13,8 +13,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.docuaction.analysis.entity.AnalysisJob;
+import com.docuaction.analysis.entity.AnalysisJobStatus;
+import com.docuaction.analysis.repository.AnalysisJobRepository;
 import com.docuaction.document.entity.Document;
 import com.docuaction.document.entity.DocumentAnalysisStatus;
 import com.docuaction.document.entity.DocumentType;
@@ -31,7 +33,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Transactional
 class DocumentUploadIntegrationTest {
 
 	@TempDir
@@ -45,6 +46,9 @@ class DocumentUploadIntegrationTest {
 
 	@Autowired
 	private DocumentRepository documentRepository;
+
+	@Autowired
+	private AnalysisJobRepository analysisJobRepository;
 
 	@DynamicPropertySource
 	static void configureStoragePath(DynamicPropertyRegistry registry) {
@@ -77,8 +81,24 @@ class DocumentUploadIntegrationTest {
 		assertThat(document.getOriginalFileName()).isEqualTo("bill.pdf");
 		assertThat(document.getMimeType()).isEqualTo("application/pdf");
 		assertThat(document.getDocumentType()).isEqualTo(DocumentType.UNKNOWN);
-		assertThat(document.getAnalysisStatus()).isEqualTo(DocumentAnalysisStatus.UPLOADED);
+		assertThat(document.getAnalysisStatus()).isIn(
+			DocumentAnalysisStatus.UPLOADED,
+			DocumentAnalysisStatus.PROCESSING,
+			DocumentAnalysisStatus.NEEDS_REVIEW
+		);
 		assertThat(Files.exists(Path.of(document.getFilePath()))).isTrue();
+	}
+
+	@Test
+	void uploadDocumentEventuallyStartsAnalysis() throws Exception {
+		String accessToken = signupAndLogin("analysis@example.com");
+		Long documentId = upload(accessToken, "analysis.pdf");
+
+		Document document = awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+		AnalysisJob analysisJob = analysisJobRepository.findTopByDocumentIdOrderByCreatedAtDesc(documentId).orElseThrow();
+
+		assertThat(document.getAnalysisStatus()).isEqualTo(DocumentAnalysisStatus.NEEDS_REVIEW);
+		assertThat(analysisJob.getStatus()).isEqualTo(AnalysisJobStatus.COMPLETED);
 	}
 
 	@Test
@@ -98,7 +118,7 @@ class DocumentUploadIntegrationTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.totalElements").value(2))
 			.andExpect(jsonPath("$.data.content[0].documentId").exists())
-			.andExpect(jsonPath("$.data.content[0].analysisStatus").value("UPLOADED"));
+			.andExpect(jsonPath("$.data.content[0].analysisStatus").exists());
 	}
 
 	@Test
@@ -113,7 +133,7 @@ class DocumentUploadIntegrationTest {
 			.andExpect(jsonPath("$.data.documentId").value(documentId))
 			.andExpect(jsonPath("$.data.originalFileName").value("contract.pdf"))
 			.andExpect(jsonPath("$.data.documentType").value("UNKNOWN"))
-			.andExpect(jsonPath("$.data.analysisStatus").value("UPLOADED"));
+			.andExpect(jsonPath("$.data.analysisStatus").exists());
 	}
 
 	@Test
@@ -204,5 +224,20 @@ class DocumentUploadIntegrationTest {
 			.getContentAsString();
 
 		return objectMapper.readTree(response).path("data").path("documentId").asLong();
+	}
+
+	private Document awaitDocumentStatus(Long documentId, DocumentAnalysisStatus expectedStatus) throws Exception {
+		long deadline = System.currentTimeMillis() + 3000;
+		Document document = documentRepository.findById(documentId).orElseThrow();
+
+		while (System.currentTimeMillis() < deadline) {
+			document = documentRepository.findById(documentId).orElseThrow();
+			if (document.getAnalysisStatus() == expectedStatus) {
+				return document;
+			}
+			Thread.sleep(100);
+		}
+
+		return document;
 	}
 }

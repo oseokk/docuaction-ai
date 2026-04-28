@@ -152,5 +152,16 @@ public class Document {
 	public Instant getUpdatedAt() {
 		return updatedAt;
 	}
-}
 
+	public void markProcessing() {
+		this.analysisStatus = DocumentAnalysisStatus.PROCESSING;
+	}
+
+	public void markNeedsReview() {
+		this.analysisStatus = DocumentAnalysisStatus.NEEDS_REVIEW;
+	}
+
+	public void markFailed(DocumentAnalysisStatus failedStatus) {
+		this.analysisStatus = failedStatus;
+	}
+}
