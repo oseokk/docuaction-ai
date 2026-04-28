@@ -1,0 +1,14 @@
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Runtime
+*.log
+.env
+
+# Build
+backend/build/
+backend/.gradle/
+
