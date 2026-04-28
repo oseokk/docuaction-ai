@@ -1,68 +1,129 @@
 # DocuAction AI
 
-DocuAction AI is a personal document automation service.
+DocuAction AI is an AI-powered document automation service.
 
-The goal is not just to store documents. The service analyzes uploaded documents, extracts important fields, and turns them into follow-up actions such as reminders, expense records, and calendar events.
+The service does not stop at storing uploaded documents. It extracts text, structures the document with AI-style analysis, lets the user review the result, and turns confirmed document data into follow-up actions such as reminders and expense records.
+
+## Current MVP Flow
+
+```text
+Sign up / log in
+-> Upload a PDF or image
+-> Create an async analysis job
+-> Extract PDF text
+-> Classify and structure the document
+-> Save extracted fields
+-> Wait for user review
+-> Confirm reviewed result
+-> Generate document actions
+-> Query or complete upcoming actions
+```
+
+## Implemented Backend Features
+
+- Common API response and global exception handling
+- Email/password signup and login
+- BCrypt password hashing
+- JWT access token authentication
+- Current user lookup
+- Multipart document upload
+- File extension, MIME type, and 10MB size validation
+- UUID-based local file storage
+- User-owned document list and detail APIs
+- Async analysis job pipeline
+- PDF text extraction with Apache PDFBox
+- Mock AI document classification and field extraction
+- User review API for correcting AI results
+- Automatic action generation after review
+- Upcoming action query
+- Action completion
+- Logical document deletion
+
+## Tech Stack
+
+- Java 17
+- Spring Boot 3.5
+- Spring Security
+- Spring Data JPA
+- H2 for local MVP development
+- PostgreSQL driver included for production-like migration
+- Apache PDFBox
+- Gradle Wrapper
+
+## Run Locally
+
+```bash
+cd backend
+./gradlew bootRun
+```
+
+Health check:
+
+```bash
+curl http://localhost:8080/api/health
+```
+
+Run tests:
+
+```bash
+cd backend
+./gradlew test
+```
+
+## Local Storage
+
+Uploaded files are stored under:
+
+```text
+backend/storage/documents
+```
+
+This directory is ignored by Git.
+
+## API Documentation
+
+See [docs/api.md](docs/api.md).
 
 ## Product Direction
 
-Initial target users are freelancers and solo business owners who repeatedly manage receipts, contracts, bills, and certificates.
+The first target users are freelancers and solo business owners who repeatedly manage receipts, contracts, bills, and certificates.
 
 Core value:
 
-- Upload a document from mobile.
-- Extract text with OCR or PDF parsing.
-- Classify the document type with AI.
-- Extract fields such as issuer, amount, due date, and contract end date.
-- Let the user review the result.
-- Create actionable reminders or records.
+- Extract obligations, dates, and amounts from documents.
+- Reduce manual document review and reminder setup.
+- Keep user review in the loop before actions become active.
 
-## MVP Scope
+## Design Principles
 
-The first MVP focuses on a small but production-shaped flow:
-
-1. User signup and login
-2. Document upload
-3. Analysis status tracking
-4. PDF text extraction and one image OCR provider
-5. AI document classification and field extraction
-6. User review and correction
-7. Draft action creation
-8. Action confirmation
-9. Document list/detail APIs
-10. Upcoming action APIs
-11. Usage quota tracking
-
-## Initial Tech Stack
-
-- Backend: Java 17, Spring Boot
-- Database: PostgreSQL
-- Mobile: Flutter, after backend MVP stabilizes
-- Storage: local private storage for MVP, S3-compatible storage later
-- AI: schema-based AI response for classification and extraction
-- OCR: one provider for MVP, with provider abstraction
+- AI output is never treated as final without validation or user review.
+- Sensitive document data is private by default.
+- Background analysis must be recoverable and observable.
+- Cost-sensitive AI/OCR work should be tracked and quota-controlled.
+- The MVP should stay small but production-shaped.
 
 ## Repository Structure
-
-Planned structure:
 
 ```text
 docuAI/
   backend/
-  mobile/
+    src/main/java/com/docuaction/
+      action/
+      analysis/
+      auth/
+      common/
+      document/
+      file/
+      user/
   docs/
 ```
 
-Current focus:
+## Next Milestones
 
-- `docs/` for product and engineering decisions
-- `backend/` after project scaffolding
-
-## Key Design Principles
-
-- AI output is never trusted without validation.
-- Sensitive document data is treated as private by default.
-- Cost is controlled with quotas, caching, and usage logs.
-- User review is part of the main flow, not an optional afterthought.
-- Background analysis must be recoverable after failures.
+- Replace mock AI analysis with schema-based OpenAI integration.
+- Add image OCR provider integration.
+- Add refresh token support.
+- Add usage quota and AI/OCR usage logs.
+- Add OpenAPI/Swagger generation.
+- Start Flutter mobile MVP.
 

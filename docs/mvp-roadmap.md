@@ -18,7 +18,7 @@ Deliverables:
 - product risk addendum
 - backend implementation checklist
 
-## Phase 1. Backend Foundation
+## Phase 1. Backend Foundation - Done
 
 Goal: create a runnable Spring Boot backend.
 
@@ -35,7 +35,7 @@ Done when:
 - Health check API responds
 - Basic project structure is stable
 
-## Phase 2. Auth
+## Phase 2. Auth - Done
 
 Goal: support authenticated document ownership.
 
@@ -51,7 +51,7 @@ Done when:
 - A user can sign up and log in
 - Protected APIs can identify the user
 
-## Phase 3. Document Upload
+## Phase 3. Document Upload - Done
 
 Goal: upload and store documents safely.
 
@@ -68,7 +68,7 @@ Done when:
 - A logged-in user can upload a PDF or image
 - The document appears in the database with `UPLOADED` status
 
-## Phase 4. Analysis Pipeline
+## Phase 4. Analysis Pipeline - Done
 
 Goal: analyze uploaded documents asynchronously.
 
@@ -85,7 +85,7 @@ Done when:
 
 - A document can move from `UPLOADED` to `NEEDS_REVIEW` or a failure status
 
-## Phase 5. User Review
+## Phase 5. User Review - Done
 
 Goal: make AI results trustworthy through user correction.
 
@@ -99,7 +99,7 @@ Done when:
 
 - A user can approve or correct AI results before actions become active
 
-## Phase 6. Actions
+## Phase 6. Actions - Done
 
 Goal: turn documents into useful follow-up work.
 
@@ -113,7 +113,7 @@ Done when:
 
 - Confirmed analysis results create actionable records
 
-## Phase 7. Portfolio Packaging
+## Phase 7. Portfolio Packaging - In Progress
 
 Goal: make the project easy to evaluate.
 
@@ -124,3 +124,28 @@ Goal: make the project easy to evaluate.
 - Demo screenshots or GIF
 - README polish
 
+## Phase 8. Real AI/OCR Integration
+
+Goal: replace MVP stubs with production-like AI/OCR providers.
+
+- OpenAI structured output integration
+- Prompt and schema validation
+- AI usage logging
+- Image OCR provider integration
+- Retry and failure visibility
+
+Done when:
+
+- PDF text and OCR text can be analyzed through a real AI provider
+- AI usage can be monitored per document and user
+
+## Phase 9. Mobile MVP
+
+Goal: add a mobile client for the end-to-end product experience.
+
+- Flutter project setup
+- Login screen
+- Document upload screen
+- Analysis result review screen
+- Document list/detail screens
+- Upcoming action screen
