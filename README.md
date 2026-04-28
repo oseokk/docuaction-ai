@@ -84,6 +84,11 @@ This directory is ignored by Git.
 
 See [docs/api.md](docs/api.md).
 
+## Architecture Documentation
+
+- [Architecture](docs/architecture.md)
+- [ERD](docs/erd.md)
+
 ## Product Direction
 
 The first target users are freelancers and solo business owners who repeatedly manage receipts, contracts, bills, and certificates.
@@ -126,4 +131,3 @@ docuAI/
 - Add usage quota and AI/OCR usage logs.
 - Add OpenAPI/Swagger generation.
 - Start Flutter mobile MVP.
-
