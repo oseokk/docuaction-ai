@@ -3,9 +3,13 @@ package com.docuaction.document.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.docuaction.common.exception.BusinessException;
 import com.docuaction.common.response.ErrorCode;
+import com.docuaction.document.dto.DocumentDetailResponse;
+import com.docuaction.document.dto.DocumentListResponse;
 import com.docuaction.document.dto.DocumentUploadResponse;
 import com.docuaction.document.entity.Document;
 import com.docuaction.document.repository.DocumentRepository;
@@ -54,5 +58,16 @@ public class DocumentService {
 			"Document uploaded. Analysis is ready to start."
 		);
 	}
-}
 
+	public Page<DocumentListResponse> getDocuments(Long userId, Pageable pageable) {
+		return documentRepository.findByUserIdAndDeletedFalse(userId, pageable)
+			.map(DocumentListResponse::from);
+	}
+
+	public DocumentDetailResponse getDocument(Long documentId, Long userId) {
+		Document document = documentRepository.findByIdAndUserIdAndDeletedFalse(documentId, userId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Document not found."));
+
+		return DocumentDetailResponse.from(document);
+	}
+}
