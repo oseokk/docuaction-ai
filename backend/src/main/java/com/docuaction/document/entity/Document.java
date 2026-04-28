@@ -205,4 +205,8 @@ public class Document {
 		this.summary = summary;
 		this.analysisStatus = DocumentAnalysisStatus.COMPLETED;
 	}
+
+	public void delete() {
+		this.deleted = true;
+	}
 }

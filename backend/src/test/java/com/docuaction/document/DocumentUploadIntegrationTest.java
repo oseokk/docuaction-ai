@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -282,6 +283,57 @@ class DocumentUploadIntegrationTest {
 		Long actionId = objectMapper.readTree(detailResponse).path("data").path("actions").get(0).path("actionId").asLong();
 
 		mockMvc.perform(post("/api/actions/{actionId}/complete", actionId)
+				.header("Authorization", "Bearer " + otherToken))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error.code").value("COMMON_404"));
+	}
+
+	@Test
+	void deleteDocumentHidesDocumentAndItsUpcomingActions() throws Exception {
+		String accessToken = signupAndLogin("delete@example.com");
+		Long documentId = upload(accessToken, "delete.pdf", "Electric bill amount 72300 due 2026-05-10");
+		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+		reviewBill(accessToken, documentId);
+
+		mockMvc.perform(get("/api/actions/upcoming")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.length()").value(1));
+
+		mockMvc.perform(delete("/api/documents/{documentId}", documentId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.documentId").value(documentId));
+
+		mockMvc.perform(get("/api/documents/{documentId}", documentId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.success").value(false));
+
+		mockMvc.perform(get("/api/documents")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.totalElements").value(0));
+
+		mockMvc.perform(get("/api/actions/upcoming")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.length()").value(0));
+
+		Document deletedDocument = documentRepository.findById(documentId).orElseThrow();
+		assertThat(deletedDocument.isDeleted()).isTrue();
+		assertThat(Files.exists(Path.of(deletedDocument.getFilePath()))).isTrue();
+	}
+
+	@Test
+	void deleteOtherUsersDocumentReturnsNotFound() throws Exception {
+		String ownerToken = signupAndLogin("delete-owner@example.com");
+		String otherToken = signupAndLogin("delete-other@example.com");
+		Long documentId = upload(ownerToken, "delete-private.pdf");
+
+		mockMvc.perform(delete("/api/documents/{documentId}", documentId)
 				.header("Authorization", "Bearer " + otherToken))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.success").value(false))

@@ -19,6 +19,12 @@ public interface DocumentActionRepository extends JpaRepository<DocumentAction, 
 		LocalDate actionDate
 	);
 
+	List<DocumentAction> findByUserIdAndStatusAndActionDateGreaterThanEqualAndDocumentDeletedFalseOrderByActionDateAscIdAsc(
+		Long userId,
+		DocumentActionStatus status,
+		LocalDate actionDate
+	);
+
 	Optional<DocumentAction> findByIdAndUserId(Long id, Long userId);
 
 	void deleteByDocumentId(Long documentId);

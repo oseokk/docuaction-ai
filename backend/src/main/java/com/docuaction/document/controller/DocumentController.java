@@ -3,6 +3,7 @@ package com.docuaction.document.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import com.docuaction.common.response.ApiResponse;
 import com.docuaction.common.response.PageResponse;
 import com.docuaction.common.security.SecurityUtils;
 import com.docuaction.document.dto.DocumentDetailResponse;
+import com.docuaction.document.dto.DocumentDeleteResponse;
 import com.docuaction.document.dto.DocumentListResponse;
 import com.docuaction.document.dto.DocumentReviewRequest;
 import com.docuaction.document.dto.DocumentReviewResponse;
@@ -71,5 +73,11 @@ public class DocumentController {
 	) {
 		Long userId = SecurityUtils.currentUser().userId();
 		return ApiResponse.success(documentReviewService.review(documentId, userId, request));
+	}
+
+	@DeleteMapping("/{documentId}")
+	public ApiResponse<DocumentDeleteResponse> deleteDocument(@PathVariable Long documentId) {
+		Long userId = SecurityUtils.currentUser().userId();
+		return ApiResponse.success(documentService.deleteDocument(documentId, userId));
 	}
 }

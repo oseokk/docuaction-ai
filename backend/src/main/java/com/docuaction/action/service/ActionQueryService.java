@@ -22,7 +22,7 @@ public class ActionQueryService {
 
 	public List<ActionResponse> getUpcomingActions(Long userId) {
 		return documentActionRepository
-			.findByUserIdAndStatusAndActionDateGreaterThanEqualOrderByActionDateAscIdAsc(
+			.findByUserIdAndStatusAndActionDateGreaterThanEqualAndDocumentDeletedFalseOrderByActionDateAscIdAsc(
 				userId,
 				DocumentActionStatus.PENDING,
 				LocalDate.now()
@@ -32,4 +32,3 @@ public class ActionQueryService {
 			.toList();
 	}
 }
-

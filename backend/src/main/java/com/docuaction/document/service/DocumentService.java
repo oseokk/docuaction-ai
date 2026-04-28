@@ -12,6 +12,7 @@ import com.docuaction.analysis.service.AnalysisJobService;
 import com.docuaction.common.exception.BusinessException;
 import com.docuaction.common.response.ErrorCode;
 import com.docuaction.document.dto.DocumentDetailResponse;
+import com.docuaction.document.dto.DocumentDeleteResponse;
 import com.docuaction.document.dto.DocumentListResponse;
 import com.docuaction.document.dto.DocumentUploadResponse;
 import com.docuaction.document.entity.Document;
@@ -90,5 +91,15 @@ public class DocumentService {
 				.map(ActionResponse::from)
 				.toList()
 		);
+	}
+
+	@Transactional
+	public DocumentDeleteResponse deleteDocument(Long documentId, Long userId) {
+		Document document = documentRepository.findByIdAndUserIdAndDeletedFalse(documentId, userId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Document not found."));
+
+		document.delete();
+
+		return new DocumentDeleteResponse(document.getId(), "Document deleted.");
 	}
 }
