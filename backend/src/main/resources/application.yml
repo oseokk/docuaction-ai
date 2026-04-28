@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -22,3 +22,7 @@ spring:
 server:
   port: 8080
 
+docuaction:
+  jwt:
+    secret: local-development-secret-key-change-before-production-1234567890
+    access-token-expiration-seconds: 3600

@@ -8,7 +8,10 @@ public enum ErrorCode {
 	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON_401", "Authentication is required."),
 	FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON_403", "Access is denied."),
 	NOT_FOUND(HttpStatus.NOT_FOUND, "COMMON_404", "Resource not found."),
-	INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "Internal server error.");
+	INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "Internal server error."),
+	DUPLICATE_EMAIL(HttpStatus.CONFLICT, "USER_409", "Email already exists."),
+	INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_401", "Invalid email or password."),
+	INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_402", "Invalid or expired token.");
 
 	private final HttpStatus status;
 	private final String code;
@@ -32,4 +35,3 @@ public enum ErrorCode {
 		return message;
 	}
 }
-
