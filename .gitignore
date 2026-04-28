@@ -7,8 +7,8 @@
 # Runtime
 *.log
 .env
+backend/storage/
 
 # Build
 backend/build/
 backend/.gradle/
-

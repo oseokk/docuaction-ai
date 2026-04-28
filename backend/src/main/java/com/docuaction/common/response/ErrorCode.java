@@ -11,7 +11,9 @@ public enum ErrorCode {
 	INTERNAL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON_500", "Internal server error."),
 	DUPLICATE_EMAIL(HttpStatus.CONFLICT, "USER_409", "Email already exists."),
 	INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "AUTH_401", "Invalid email or password."),
-	INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_402", "Invalid or expired token.");
+	INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "AUTH_402", "Invalid or expired token."),
+	INVALID_FILE(HttpStatus.BAD_REQUEST, "DOCUMENT_400", "Invalid file."),
+	FILE_STORAGE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "DOCUMENT_500", "Failed to store file.");
 
 	private final HttpStatus status;
 	private final String code;
