@@ -3,6 +3,7 @@ package com.docuaction.document.dto;
 import java.time.Instant;
 import java.util.List;
 
+import com.docuaction.action.dto.ActionResponse;
 import com.docuaction.document.entity.Document;
 import com.docuaction.document.entity.DocumentField;
 
@@ -17,11 +18,16 @@ public record DocumentDetailResponse(
 	String mimeType,
 	String analysisStatus,
 	List<DocumentFieldResponse> fields,
+	List<ActionResponse> actions,
 	Instant createdAt,
 	Instant updatedAt
 ) {
 
-	public static DocumentDetailResponse from(Document document, List<DocumentField> fields) {
+	public static DocumentDetailResponse from(
+		Document document,
+		List<DocumentField> fields,
+		List<ActionResponse> actions
+	) {
 		return new DocumentDetailResponse(
 			document.getId(),
 			document.getDocumentType().name(),
@@ -33,6 +39,7 @@ public record DocumentDetailResponse(
 			document.getMimeType(),
 			document.getAnalysisStatus().name(),
 			fields.stream().map(DocumentFieldResponse::from).toList(),
+			actions,
 			document.getCreatedAt(),
 			document.getUpdatedAt()
 		);

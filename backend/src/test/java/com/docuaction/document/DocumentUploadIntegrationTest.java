@@ -217,7 +217,19 @@ class DocumentUploadIntegrationTest {
 			.andExpect(jsonPath("$.data.summary").value("사용자가 검수한 고지서입니다."))
 			.andExpect(jsonPath("$.data.fields.length()").value(3))
 			.andExpect(jsonPath("$.data.fields[1].key").value("amount"))
-			.andExpect(jsonPath("$.data.fields[1].value").value("80000"));
+			.andExpect(jsonPath("$.data.fields[1].value").value("80000"))
+			.andExpect(jsonPath("$.data.actions.length()").value(1))
+			.andExpect(jsonPath("$.data.actions[0].actionType").value("REMINDER"))
+			.andExpect(jsonPath("$.data.actions[0].actionDate").value("2026-05-08"))
+			.andExpect(jsonPath("$.data.actions[0].status").value("PENDING"));
+
+		mockMvc.perform(get("/api/actions/upcoming")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.length()").value(1))
+			.andExpect(jsonPath("$.data[0].documentId").value(documentId))
+			.andExpect(jsonPath("$.data[0].title").value("납부기한 알림"));
 	}
 
 	@Test

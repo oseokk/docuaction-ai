@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.docuaction.action.service.ActionCreationService;
 import com.docuaction.common.exception.BusinessException;
 import com.docuaction.common.response.ErrorCode;
 import com.docuaction.document.dto.DocumentReviewRequest;
@@ -20,13 +21,16 @@ public class DocumentReviewService {
 
 	private final DocumentRepository documentRepository;
 	private final DocumentFieldRepository documentFieldRepository;
+	private final ActionCreationService actionCreationService;
 
 	public DocumentReviewService(
 		DocumentRepository documentRepository,
-		DocumentFieldRepository documentFieldRepository
+		DocumentFieldRepository documentFieldRepository,
+		ActionCreationService actionCreationService
 	) {
 		this.documentRepository = documentRepository;
 		this.documentFieldRepository = documentFieldRepository;
+		this.actionCreationService = actionCreationService;
 	}
 
 	@Transactional
@@ -35,7 +39,8 @@ public class DocumentReviewService {
 			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Document not found."));
 
 		document.completeReview(request.documentType(), request.title(), request.summary());
-		replaceFields(document, request.fieldsOrEmpty());
+		List<DocumentField> fields = replaceFields(document, request.fieldsOrEmpty());
+		actionCreationService.recreateActions(document, fields);
 
 		return new DocumentReviewResponse(
 			document.getId(),
@@ -44,7 +49,10 @@ public class DocumentReviewService {
 		);
 	}
 
-	private void replaceFields(Document document, List<DocumentReviewRequest.DocumentReviewFieldRequest> fields) {
+	private List<DocumentField> replaceFields(
+		Document document,
+		List<DocumentReviewRequest.DocumentReviewFieldRequest> fields
+	) {
 		documentFieldRepository.deleteByDocumentId(document.getId());
 		List<DocumentField> newFields = fields.stream()
 			.map(field -> new DocumentField(
@@ -55,7 +63,6 @@ public class DocumentReviewService {
 				field.type()
 			))
 			.toList();
-		documentFieldRepository.saveAll(newFields);
+		return documentFieldRepository.saveAll(newFields);
 	}
 }
-

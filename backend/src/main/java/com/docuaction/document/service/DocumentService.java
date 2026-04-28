@@ -6,6 +6,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.docuaction.action.dto.ActionResponse;
+import com.docuaction.action.repository.DocumentActionRepository;
 import com.docuaction.analysis.service.AnalysisJobService;
 import com.docuaction.common.exception.BusinessException;
 import com.docuaction.common.response.ErrorCode;
@@ -26,6 +28,7 @@ public class DocumentService {
 
 	private final DocumentRepository documentRepository;
 	private final DocumentFieldRepository documentFieldRepository;
+	private final DocumentActionRepository documentActionRepository;
 	private final UserRepository userRepository;
 	private final FileStorageService fileStorageService;
 	private final AnalysisJobService analysisJobService;
@@ -33,12 +36,14 @@ public class DocumentService {
 	public DocumentService(
 		DocumentRepository documentRepository,
 		DocumentFieldRepository documentFieldRepository,
+		DocumentActionRepository documentActionRepository,
 		UserRepository userRepository,
 		FileStorageService fileStorageService,
 		AnalysisJobService analysisJobService
 	) {
 		this.documentRepository = documentRepository;
 		this.documentFieldRepository = documentFieldRepository;
+		this.documentActionRepository = documentActionRepository;
 		this.userRepository = userRepository;
 		this.fileStorageService = fileStorageService;
 		this.analysisJobService = analysisJobService;
@@ -79,7 +84,11 @@ public class DocumentService {
 
 		return DocumentDetailResponse.from(
 			document,
-			documentFieldRepository.findByDocumentIdOrderByIdAsc(document.getId())
+			documentFieldRepository.findByDocumentIdOrderByIdAsc(document.getId()),
+			documentActionRepository.findByDocumentIdOrderByActionDateAscIdAsc(document.getId())
+				.stream()
+				.map(ActionResponse::from)
+				.toList()
 		);
 	}
 }
