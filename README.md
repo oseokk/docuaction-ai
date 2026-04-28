@@ -33,6 +33,7 @@ Sign up / log in
 - Async analysis job pipeline
 - PDF text extraction with Apache PDFBox
 - Mock AI document classification and field extraction
+- Optional OpenAI Responses API integration with Structured Outputs
 - User review API for correcting AI results
 - Automatic action generation after review
 - Upcoming action query
@@ -49,6 +50,23 @@ Sign up / log in
 - PostgreSQL driver included for production-like migration
 - Apache PDFBox
 - Gradle Wrapper
+
+## AI Provider Configuration
+
+The default local mode uses the mock analyzer:
+
+```bash
+DOCUACTION_AI_PROVIDER=mock
+```
+
+To use OpenAI:
+
+```bash
+DOCUACTION_AI_PROVIDER=openai
+OPENAI_API_KEY=your_api_key
+```
+
+The OpenAI adapter uses the Responses API with JSON schema structured output. The default model is configured in `backend/src/main/resources/application.yml`.
 
 ## Run Locally
 
@@ -126,6 +144,7 @@ docuAI/
 ## Next Milestones
 
 - Replace mock AI analysis with schema-based OpenAI integration.
+- Add provider usage logging and cost estimates.
 - Add image OCR provider integration.
 - Add refresh token support.
 - Add usage quota and AI/OCR usage logs.

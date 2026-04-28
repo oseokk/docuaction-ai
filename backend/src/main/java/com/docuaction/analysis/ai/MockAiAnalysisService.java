@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import com.docuaction.analysis.dto.AiAnalysisField;
@@ -13,6 +14,7 @@ import com.docuaction.document.entity.DocumentFieldType;
 import com.docuaction.document.entity.DocumentType;
 
 @Service
+@ConditionalOnProperty(prefix = "docuaction.ai", name = "provider", havingValue = "mock", matchIfMissing = true)
 public class MockAiAnalysisService implements AiAnalysisService {
 
 	private static final Pattern DATE_PATTERN = Pattern.compile("\\b(20\\d{2}-\\d{2}-\\d{2})\\b");
@@ -117,4 +119,3 @@ public class MockAiAnalysisService implements AiAnalysisService {
 		return null;
 	}
 }
-

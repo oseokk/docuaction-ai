@@ -4,6 +4,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.docuaction.analysis.ai.AiAnalysisException;
 import com.docuaction.analysis.ai.AiAnalysisService;
 import com.docuaction.analysis.dto.AiAnalysisResult;
 import com.docuaction.analysis.entity.AnalysisJob;
@@ -55,6 +56,9 @@ public class DocumentAnalysisAsyncService {
 		} catch (TextExtractionException exception) {
 			document.markFailed(DocumentAnalysisStatus.OCR_FAILED);
 			analysisJob.markFailed("OCR_FAILED", exception.getMessage());
+		} catch (AiAnalysisException exception) {
+			document.markFailed(DocumentAnalysisStatus.AI_FAILED);
+			analysisJob.markFailed("AI_FAILED", exception.getMessage());
 		} catch (RuntimeException exception) {
 			document.markFailed(DocumentAnalysisStatus.FAILED);
 			analysisJob.markFailed("ANALYSIS_FAILED", exception.getMessage());

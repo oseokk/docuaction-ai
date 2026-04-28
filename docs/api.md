@@ -117,7 +117,7 @@ Response data:
 }
 ```
 
-After upload, an async analysis job starts. PDF files are parsed with PDFBox. The current MVP uses a mock AI analyzer to classify and extract fields.
+After upload, an async analysis job starts. PDF files are parsed with PDFBox. The default local mode uses a mock AI analyzer. If `DOCUACTION_AI_PROVIDER=openai` and `OPENAI_API_KEY` are configured, the OpenAI adapter calls the Responses API with structured JSON output.
 
 ### `GET /api/documents?page=0&size=20`
 
@@ -221,4 +221,3 @@ Current MVP rules:
 - `BILL` with `dueDate`: creates `REMINDER` 3 days before due date.
 - `RECEIPT` with `amount`: creates `EXPENSE_RECORD`.
 - `CONTRACT` with `endDate`: creates `REMINDER` 30 days before end date.
-

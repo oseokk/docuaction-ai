@@ -128,7 +128,7 @@ Goal: make the project easy to evaluate.
 
 Goal: replace MVP stubs with production-like AI/OCR providers.
 
-- OpenAI structured output integration
+- OpenAI structured output integration - Started
 - Prompt and schema validation
 - AI usage logging
 - Image OCR provider integration

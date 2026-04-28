@@ -27,7 +27,7 @@ flowchart TD
     DB[("Database")]
     Async["Async Analysis Worker"]
     PDF["PDF Text Extractor"]
-    AI["Mock AI Analyzer"]
+    AI["AI Analyzer\nMock or OpenAI"]
 
     Client --> Auth
     Auth --> DB
@@ -123,16 +123,15 @@ stateDiagram-v2
 
 - PDF text extraction is real and uses Apache PDFBox.
 - Image OCR is not integrated yet.
-- AI analysis is represented by `MockAiAnalysisService`.
+- AI analysis defaults to `MockAiAnalysisService`.
+- OpenAI integration can be enabled with `DOCUACTION_AI_PROVIDER=openai` and `OPENAI_API_KEY`.
 - Local H2 is used for MVP development.
 - Uploaded files are stored locally under `backend/storage/documents`.
 - Document deletion is logical. Original files are retained in MVP.
 
 ## Next Architecture Changes
 
-- Replace `MockAiAnalysisService` with an OpenAI structured output adapter.
 - Add provider-level usage logs and cost estimates.
 - Add image OCR provider integration.
 - Move from local storage to S3-compatible private object storage.
 - Replace `@Async` with a persistent job worker or queue when needed.
-

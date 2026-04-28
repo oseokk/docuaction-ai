@@ -28,3 +28,8 @@ docuaction:
     access-token-expiration-seconds: 3600
   storage:
     document-path: ./storage/documents
+  ai:
+    provider: ${DOCUACTION_AI_PROVIDER:mock}
+  openai:
+    api-key: ${OPENAI_API_KEY:}
+    model: gpt-5.2
