@@ -14,6 +14,7 @@ import com.docuaction.document.dto.DocumentListResponse;
 import com.docuaction.document.dto.DocumentUploadResponse;
 import com.docuaction.document.entity.Document;
 import com.docuaction.document.repository.DocumentRepository;
+import com.docuaction.document.repository.DocumentFieldRepository;
 import com.docuaction.file.service.StoredFile;
 import com.docuaction.file.service.FileStorageService;
 import com.docuaction.user.entity.User;
@@ -24,17 +25,20 @@ import com.docuaction.user.repository.UserRepository;
 public class DocumentService {
 
 	private final DocumentRepository documentRepository;
+	private final DocumentFieldRepository documentFieldRepository;
 	private final UserRepository userRepository;
 	private final FileStorageService fileStorageService;
 	private final AnalysisJobService analysisJobService;
 
 	public DocumentService(
 		DocumentRepository documentRepository,
+		DocumentFieldRepository documentFieldRepository,
 		UserRepository userRepository,
 		FileStorageService fileStorageService,
 		AnalysisJobService analysisJobService
 	) {
 		this.documentRepository = documentRepository;
+		this.documentFieldRepository = documentFieldRepository;
 		this.userRepository = userRepository;
 		this.fileStorageService = fileStorageService;
 		this.analysisJobService = analysisJobService;
@@ -73,6 +77,9 @@ public class DocumentService {
 		Document document = documentRepository.findByIdAndUserIdAndDeletedFalse(documentId, userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Document not found."));
 
-		return DocumentDetailResponse.from(document);
+		return DocumentDetailResponse.from(
+			document,
+			documentFieldRepository.findByDocumentIdOrderByIdAsc(document.getId())
+		);
 	}
 }

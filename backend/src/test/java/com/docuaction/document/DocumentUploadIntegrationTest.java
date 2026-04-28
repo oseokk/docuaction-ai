@@ -26,6 +26,7 @@ import com.docuaction.analysis.repository.AnalysisJobRepository;
 import com.docuaction.document.entity.Document;
 import com.docuaction.document.entity.DocumentAnalysisStatus;
 import com.docuaction.document.entity.DocumentType;
+import com.docuaction.document.repository.DocumentFieldRepository;
 import com.docuaction.document.repository.DocumentRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,6 +53,9 @@ class DocumentUploadIntegrationTest {
 
 	@Autowired
 	private DocumentRepository documentRepository;
+
+	@Autowired
+	private DocumentFieldRepository documentFieldRepository;
 
 	@Autowired
 	private AnalysisJobRepository analysisJobRepository;
@@ -98,13 +102,21 @@ class DocumentUploadIntegrationTest {
 	@Test
 	void uploadDocumentEventuallyStartsAnalysis() throws Exception {
 		String accessToken = signupAndLogin("analysis@example.com");
-		Long documentId = upload(accessToken, "analysis.pdf", "Analysis pipeline PDF text");
+		Long documentId = upload(accessToken, "analysis.pdf", "Electric bill amount 72300 due 2026-05-10");
 
 		Document document = awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
 		AnalysisJob analysisJob = analysisJobRepository.findTopByDocumentIdOrderByCreatedAtDesc(documentId).orElseThrow();
 
 		assertThat(document.getAnalysisStatus()).isEqualTo(DocumentAnalysisStatus.NEEDS_REVIEW);
-		assertThat(document.getOcrText()).contains("Analysis pipeline PDF text");
+		assertThat(document.getOcrText()).contains("Electric bill amount 72300 due 2026-05-10");
+		assertThat(document.getDocumentType()).isEqualTo(DocumentType.BILL);
+		assertThat(document.getSummary()).contains("납부");
+		assertThat(documentFieldRepository.findByDocumentIdOrderByIdAsc(documentId))
+			.extracting("fieldKey", "fieldValue")
+			.contains(
+				org.assertj.core.groups.Tuple.tuple("amount", "72300"),
+				org.assertj.core.groups.Tuple.tuple("dueDate", "2026-05-10")
+			);
 		assertThat(analysisJob.getStatus()).isEqualTo(AnalysisJobStatus.COMPLETED);
 	}
 
@@ -139,7 +151,8 @@ class DocumentUploadIntegrationTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.documentId").value(documentId))
 			.andExpect(jsonPath("$.data.originalFileName").value("contract.pdf"))
-			.andExpect(jsonPath("$.data.documentType").value("UNKNOWN"))
+			.andExpect(jsonPath("$.data.documentType").exists())
+			.andExpect(jsonPath("$.data.fields").isArray())
 			.andExpect(jsonPath("$.data.analysisStatus").exists());
 	}
 

@@ -4,6 +4,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.docuaction.analysis.ai.AiAnalysisService;
+import com.docuaction.analysis.dto.AiAnalysisResult;
 import com.docuaction.analysis.entity.AnalysisJob;
 import com.docuaction.analysis.ocr.TextExtractionException;
 import com.docuaction.analysis.ocr.TextExtractionService;
@@ -16,13 +18,19 @@ public class DocumentAnalysisAsyncService {
 
 	private final AnalysisJobRepository analysisJobRepository;
 	private final TextExtractionService textExtractionService;
+	private final AiAnalysisService aiAnalysisService;
+	private final DocumentAnalysisResultService documentAnalysisResultService;
 
 	public DocumentAnalysisAsyncService(
 		AnalysisJobRepository analysisJobRepository,
-		TextExtractionService textExtractionService
+		TextExtractionService textExtractionService,
+		AiAnalysisService aiAnalysisService,
+		DocumentAnalysisResultService documentAnalysisResultService
 	) {
 		this.analysisJobRepository = analysisJobRepository;
 		this.textExtractionService = textExtractionService;
+		this.aiAnalysisService = aiAnalysisService;
+		this.documentAnalysisResultService = documentAnalysisResultService;
 	}
 
 	@Async
@@ -39,7 +47,9 @@ public class DocumentAnalysisAsyncService {
 			String ocrText = textExtractionService.extract(document);
 			document.updateOcrText(ocrText);
 
-			// AI classification and field extraction will replace this stub in the next phase.
+			AiAnalysisResult analysisResult = aiAnalysisService.analyze(ocrText);
+			documentAnalysisResultService.saveAnalysisResult(document, analysisResult);
+
 			document.markNeedsReview();
 			analysisJob.markCompleted();
 		} catch (TextExtractionException exception) {

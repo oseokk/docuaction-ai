@@ -58,6 +58,12 @@ public class Document {
 	@Column(nullable = false, length = 255)
 	private String title;
 
+	@Column(columnDefinition = "TEXT")
+	private String summary;
+
+	@Column
+	private Double confidence;
+
 	@Lob
 	@Column(columnDefinition = "TEXT")
 	private String ocrText;
@@ -146,6 +152,14 @@ public class Document {
 		return title;
 	}
 
+	public String getSummary() {
+		return summary;
+	}
+
+	public Double getConfidence() {
+		return confidence;
+	}
+
 	public String getOcrText() {
 		return ocrText;
 	}
@@ -176,5 +190,12 @@ public class Document {
 
 	public void updateOcrText(String ocrText) {
 		this.ocrText = ocrText;
+	}
+
+	public void applyAnalysis(DocumentType documentType, String title, String summary, Double confidence) {
+		this.documentType = documentType;
+		this.title = title;
+		this.summary = summary;
+		this.confidence = confidence;
 	}
 }

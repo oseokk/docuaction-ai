@@ -8,6 +8,7 @@ public record DocumentListResponse(
 	Long documentId,
 	String documentType,
 	String title,
+	String summary,
 	String originalFileName,
 	String analysisStatus,
 	Instant createdAt
@@ -18,10 +19,10 @@ public record DocumentListResponse(
 			document.getId(),
 			document.getDocumentType().name(),
 			document.getTitle(),
+			document.getSummary(),
 			document.getOriginalFileName(),
 			document.getAnalysisStatus().name(),
 			document.getCreatedAt()
 		);
 	}
 }
-
