@@ -198,4 +198,11 @@ public class Document {
 		this.summary = summary;
 		this.confidence = confidence;
 	}
+
+	public void completeReview(DocumentType documentType, String title, String summary) {
+		this.documentType = documentType;
+		this.title = title;
+		this.summary = summary;
+		this.analysisStatus = DocumentAnalysisStatus.COMPLETED;
+	}
 }

@@ -170,6 +170,80 @@ class DocumentUploadIntegrationTest {
 	}
 
 	@Test
+	void reviewDocumentCompletesAnalysisAndReplacesFields() throws Exception {
+		String accessToken = signupAndLogin("review@example.com");
+		Long documentId = upload(accessToken, "review.pdf", "Electric bill amount 72300 due 2026-05-10");
+		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+
+		mockMvc.perform(post("/api/documents/{documentId}/review", documentId)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "documentType": "BILL",
+					  "title": "4월 전기요금 고지서",
+					  "summary": "사용자가 검수한 고지서입니다.",
+					  "fields": [
+					    {
+					      "key": "issuer",
+					      "label": "기관명",
+					      "value": "한국전력",
+					      "type": "STRING"
+					    },
+					    {
+					      "key": "amount",
+					      "label": "납부금액",
+					      "value": "80000",
+					      "type": "NUMBER"
+					    },
+					    {
+					      "key": "dueDate",
+					      "label": "납부기한",
+					      "value": "2026-05-11",
+					      "type": "DATE"
+					    }
+					  ]
+					}
+					"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.status").value("COMPLETED"));
+
+		mockMvc.perform(get("/api/documents/{documentId}", documentId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.analysisStatus").value("COMPLETED"))
+			.andExpect(jsonPath("$.data.title").value("4월 전기요금 고지서"))
+			.andExpect(jsonPath("$.data.summary").value("사용자가 검수한 고지서입니다."))
+			.andExpect(jsonPath("$.data.fields.length()").value(3))
+			.andExpect(jsonPath("$.data.fields[1].key").value("amount"))
+			.andExpect(jsonPath("$.data.fields[1].value").value("80000"));
+	}
+
+	@Test
+	void reviewOtherUsersDocumentReturnsNotFound() throws Exception {
+		String ownerToken = signupAndLogin("review-owner@example.com");
+		String otherToken = signupAndLogin("review-other@example.com");
+		Long documentId = upload(ownerToken, "private-review.pdf");
+		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+
+		mockMvc.perform(post("/api/documents/{documentId}/review", documentId)
+				.header("Authorization", "Bearer " + otherToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "documentType": "BILL",
+					  "title": "잘못된 접근",
+					  "summary": "권한 없음",
+					  "fields": []
+					}
+					"""))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error.code").value("COMMON_404"));
+	}
+
+	@Test
 	void uploadWithoutTokenReturnsUnauthorized() throws Exception {
 		MockMultipartFile file = new MockMultipartFile(
 			"file",
