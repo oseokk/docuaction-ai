@@ -138,6 +138,7 @@ See [docs/api.md](docs/api.md).
 
 - [Architecture](docs/architecture.md)
 - [ERD](docs/erd.md)
+- [Project Status](docs/project-status.md)
 
 ## Product Direction
 
@@ -175,10 +176,8 @@ docuAI/
 
 ## Next Milestones
 
-- Replace mock AI analysis with schema-based OpenAI integration.
-- Add provider usage logging and cost estimates.
-- Add image OCR provider integration.
-- Add refresh token support.
-- Add usage quota and AI/OCR usage logs.
-- Add OpenAPI/Swagger generation.
-- Start Flutter mobile MVP.
+- Merge or continue the Flutter app shell.
+- Add a real image OCR provider adapter.
+- Add provider cost estimates to analysis usage logs.
+- Replace local file storage with private object storage.
+- Add demo screenshots or GIFs for portfolio presentation.

@@ -113,7 +113,7 @@ Done when:
 
 - Confirmed analysis results create actionable records
 
-## Phase 7. Portfolio Packaging - In Progress
+## Phase 7. Portfolio Packaging - Mostly Done
 
 Goal: make the project easy to evaluate.
 
@@ -128,10 +128,10 @@ Goal: make the project easy to evaluate.
 
 Goal: replace MVP stubs with production-like AI/OCR providers.
 
-- OpenAI structured output integration - Started
-- Prompt and schema validation
-- AI usage logging
-- Image OCR provider integration
+- OpenAI structured output integration - Done as optional provider
+- Prompt and schema validation - Started
+- AI usage logging - Started
+- Image OCR provider integration - Mock provider only
 - Retry and failure visibility
 
 Done when:
@@ -143,7 +143,7 @@ Done when:
 
 Goal: add a mobile client for the end-to-end product experience.
 
-- Flutter project setup
+- Flutter project setup - Started on `origin/feature-flutter-app-shell`
 - Login screen
 - Document upload screen
 - Analysis result review screen
