@@ -150,7 +150,7 @@ Response data:
 }
 ```
 
-After upload, an async analysis job starts. PDF files are parsed with PDFBox. The default local mode uses a mock AI analyzer. If `DOCUACTION_AI_PROVIDER=openai` and `OPENAI_API_KEY` are configured, the OpenAI adapter calls the Responses API with structured JSON output.
+After upload, an async analysis job starts. PDF files are parsed with PDFBox. The default local mode uses a mock AI analyzer. Image OCR defaults to an unsupported provider, but local demos can set `DOCUACTION_OCR_IMAGE_PROVIDER=mock`. If `DOCUACTION_AI_PROVIDER=openai` and `OPENAI_API_KEY` are configured, the OpenAI adapter calls the Responses API with structured JSON output.
 
 ### `GET /api/documents?page=0&size=20&type=BILL&status=NEEDS_REVIEW`
 

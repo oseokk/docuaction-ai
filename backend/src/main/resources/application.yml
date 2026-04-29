@@ -22,6 +22,8 @@ docuaction:
     document-path: ${DOCUACTION_STORAGE_DOCUMENT_PATH:./storage/documents}
   ai:
     provider: ${DOCUACTION_AI_PROVIDER:mock}
+  ocr:
+    image-provider: ${DOCUACTION_OCR_IMAGE_PROVIDER:unsupported}
   openai:
     api-key: ${OPENAI_API_KEY:}
     model: ${DOCUACTION_OPENAI_MODEL:gpt-5.2}

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Component;
 
 import com.docuaction.document.entity.Document;
 
-@Order(100)
+@Order(90)
 @Component
-@ConditionalOnProperty(prefix = "docuaction.ocr", name = "image-provider", havingValue = "unsupported", matchIfMissing = true)
-public class UnsupportedImageTextExtractionProvider implements TextExtractionProvider {
+@ConditionalOnProperty(prefix = "docuaction.ocr", name = "image-provider", havingValue = "mock")
+public class MockImageTextExtractionProvider implements TextExtractionProvider {
 
 	private static final Set<String> IMAGE_MIME_TYPES = Set.of("image/jpeg", "image/png");
 
@@ -22,11 +22,16 @@ public class UnsupportedImageTextExtractionProvider implements TextExtractionPro
 
 	@Override
 	public String providerName() {
-		return "UNSUPPORTED_IMAGE";
+		return "MOCK_IMAGE_OCR";
 	}
 
 	@Override
 	public String extract(Document document) {
-		throw new TextExtractionException("Image OCR provider is not configured yet.");
+		return """
+			Receipt
+			Merchant: Demo Cafe
+			Amount: 6500
+			Date: 2026-04-28
+			""".trim();
 	}
 }

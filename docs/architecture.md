@@ -123,7 +123,8 @@ stateDiagram-v2
 
 - Text extraction uses pluggable providers.
 - PDF text extraction is real and uses Apache PDFBox.
-- Image OCR currently uses an unsupported-image provider that fails clearly until a real OCR provider is configured.
+- Image OCR defaults to an unsupported-image provider that fails clearly until a real OCR provider is configured.
+- Local demos can use `DOCUACTION_OCR_IMAGE_PROVIDER=mock` to exercise the image upload analysis flow without external OCR credentials.
 - AI analysis defaults to `MockAiAnalysisService`.
 - OpenAI integration can be enabled with `DOCUACTION_AI_PROVIDER=openai` and `OPENAI_API_KEY`.
 - OCR and AI analysis steps write usage logs for provider, status, duration, payload size, and error details.

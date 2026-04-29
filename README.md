@@ -62,6 +62,12 @@ The default local mode uses the mock analyzer:
 DOCUACTION_AI_PROVIDER=mock
 ```
 
+Image OCR defaults to an unsupported provider so missing OCR integration fails clearly. For local demos, enable the mock image OCR provider:
+
+```bash
+DOCUACTION_OCR_IMAGE_PROVIDER=mock
+```
+
 To use OpenAI:
 
 ```bash
