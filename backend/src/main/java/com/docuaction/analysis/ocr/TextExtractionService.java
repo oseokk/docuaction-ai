@@ -1,5 +1,7 @@
 package com.docuaction.analysis.ocr;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.docuaction.document.entity.Document;
@@ -7,20 +9,27 @@ import com.docuaction.document.entity.Document;
 @Service
 public class TextExtractionService {
 
-	private static final String PDF_MIME_TYPE = "application/pdf";
+	private final List<TextExtractionProvider> providers;
 
-	private final PdfTextExtractor pdfTextExtractor;
-
-	public TextExtractionService(PdfTextExtractor pdfTextExtractor) {
-		this.pdfTextExtractor = pdfTextExtractor;
+	public TextExtractionService(List<TextExtractionProvider> providers) {
+		this.providers = providers;
 	}
 
-	public String extract(Document document) {
-		if (PDF_MIME_TYPE.equalsIgnoreCase(document.getMimeType())) {
-			return pdfTextExtractor.extract(document.getFilePath());
-		}
+	public TextExtractionResult extract(Document document) {
+		TextExtractionProvider provider = findProvider(document);
 
-		throw new TextExtractionException("Image OCR is not supported yet.");
+		return new TextExtractionResult(provider.extract(document), provider.providerName());
+	}
+
+	public String providerName(Document document) {
+		return findProvider(document).providerName();
+	}
+
+	private TextExtractionProvider findProvider(Document document) {
+		return providers.stream()
+			.filter(candidate -> candidate.supports(document))
+			.findFirst()
+			.orElseThrow(() -> new TextExtractionException("No text extraction provider supports this file."));
 	}
 }
 

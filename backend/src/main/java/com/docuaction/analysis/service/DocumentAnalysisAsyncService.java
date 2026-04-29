@@ -11,6 +11,7 @@ import com.docuaction.analysis.dto.AiAnalysisResult;
 import com.docuaction.analysis.entity.AnalysisJob;
 import com.docuaction.analysis.entity.AnalysisUsageOperation;
 import com.docuaction.analysis.ocr.TextExtractionException;
+import com.docuaction.analysis.ocr.TextExtractionResult;
 import com.docuaction.analysis.ocr.TextExtractionService;
 import com.docuaction.analysis.repository.AnalysisJobRepository;
 import com.docuaction.document.entity.Document;
@@ -75,9 +76,10 @@ public class DocumentAnalysisAsyncService {
 
 	private String extractTextWithUsageLog(AnalysisJob analysisJob, Document document) {
 		long startedAt = System.nanoTime();
-		String provider = ocrProvider(document);
+		String provider = textExtractionService.providerName(document);
 		try {
-			String ocrText = textExtractionService.extract(document);
+			TextExtractionResult extractionResult = textExtractionService.extract(document);
+			String ocrText = extractionResult.text();
 			analysisUsageLogService.logSuccess(
 				analysisJob,
 				AnalysisUsageOperation.OCR,
@@ -124,13 +126,6 @@ public class DocumentAnalysisAsyncService {
 			);
 			throw exception;
 		}
-	}
-
-	private String ocrProvider(Document document) {
-		if ("application/pdf".equalsIgnoreCase(document.getMimeType())) {
-			return "PDFBOX";
-		}
-		return "UNSUPPORTED_IMAGE";
 	}
 
 	private long elapsedMillis(long startedAt) {

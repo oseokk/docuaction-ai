@@ -121,8 +121,9 @@ stateDiagram-v2
 
 ## Current MVP Boundaries
 
+- Text extraction uses pluggable providers.
 - PDF text extraction is real and uses Apache PDFBox.
-- Image OCR is not integrated yet.
+- Image OCR currently uses an unsupported-image provider that fails clearly until a real OCR provider is configured.
 - AI analysis defaults to `MockAiAnalysisService`.
 - OpenAI integration can be enabled with `DOCUACTION_AI_PROVIDER=openai` and `OPENAI_API_KEY`.
 - OCR and AI analysis steps write usage logs for provider, status, duration, payload size, and error details.

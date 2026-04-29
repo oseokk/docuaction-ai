@@ -34,6 +34,7 @@ Sign up / log in
 - Async analysis job pipeline
 - AI/OCR usage logging foundation
 - PDF text extraction with Apache PDFBox
+- Pluggable text extraction provider structure
 - Mock AI document classification and field extraction
 - Optional OpenAI Responses API integration with Structured Outputs
 - User review API for correcting AI results
