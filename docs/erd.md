@@ -10,6 +10,7 @@ erDiagram
     DOCUMENTS ||--o{ DOCUMENT_FIELDS : has
     DOCUMENTS ||--o{ DOCUMENT_ACTIONS : creates
     DOCUMENTS ||--o{ ANALYSIS_JOBS : analyzed_by
+    ANALYSIS_JOBS ||--o{ ANALYSIS_USAGE_LOGS : records
 
     USERS {
         bigint user_id PK
@@ -74,6 +75,21 @@ erDiagram
         datetime updated_at
     }
 
+    ANALYSIS_USAGE_LOGS {
+        bigint usage_log_id PK
+        bigint job_id FK
+        bigint document_id FK
+        bigint user_id FK
+        varchar operation
+        varchar provider
+        varchar status
+        bigint duration_ms
+        int input_size
+        int output_size
+        text error_message
+        datetime created_at
+    }
+
     DOCUMENT_ACTIONS {
         bigint action_id PK
         bigint document_id FK
@@ -94,6 +110,7 @@ erDiagram
 - `refresh_tokens.token_hash` stores a hash of the opaque refresh token, not the original token value.
 - `document_fields` stores user-reviewable extracted values.
 - `analysis_jobs` records the async analysis lifecycle.
+- `analysis_usage_logs` records OCR/AI provider usage, duration, payload size, and failure details.
 - `document_actions` stores reminders and expense records generated after user review.
 - Dynamic extracted values are stored as field rows rather than fixed columns to support multiple document types.
 

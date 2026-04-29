@@ -125,6 +125,7 @@ stateDiagram-v2
 - Image OCR is not integrated yet.
 - AI analysis defaults to `MockAiAnalysisService`.
 - OpenAI integration can be enabled with `DOCUACTION_AI_PROVIDER=openai` and `OPENAI_API_KEY`.
+- OCR and AI analysis steps write usage logs for provider, status, duration, payload size, and error details.
 - Local H2 is used for MVP development.
 - Uploaded files are stored locally under `backend/storage/documents`.
 - Document deletion is logical. Original files are retained in MVP.

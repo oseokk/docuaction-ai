@@ -22,7 +22,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.docuaction.analysis.entity.AnalysisJob;
 import com.docuaction.analysis.entity.AnalysisJobStatus;
+import com.docuaction.analysis.entity.AnalysisUsageOperation;
+import com.docuaction.analysis.entity.AnalysisUsageStatus;
 import com.docuaction.analysis.repository.AnalysisJobRepository;
+import com.docuaction.analysis.repository.AnalysisUsageLogRepository;
 import com.docuaction.document.entity.Document;
 import com.docuaction.document.entity.DocumentAnalysisStatus;
 import com.docuaction.document.entity.DocumentType;
@@ -60,6 +63,9 @@ class DocumentUploadIntegrationTest {
 
 	@Autowired
 	private AnalysisJobRepository analysisJobRepository;
+
+	@Autowired
+	private AnalysisUsageLogRepository analysisUsageLogRepository;
 
 	@DynamicPropertySource
 	static void configureStoragePath(DynamicPropertyRegistry registry) {
@@ -119,6 +125,20 @@ class DocumentUploadIntegrationTest {
 				org.assertj.core.groups.Tuple.tuple("dueDate", "2026-05-10")
 			);
 		assertThat(analysisJob.getStatus()).isEqualTo(AnalysisJobStatus.COMPLETED);
+		assertThat(analysisUsageLogRepository.findByAnalysisJobIdOrderByIdAsc(analysisJob.getId()))
+			.extracting("operation", "provider", "status")
+			.containsExactly(
+				org.assertj.core.groups.Tuple.tuple(
+					AnalysisUsageOperation.OCR,
+					"PDFBOX",
+					AnalysisUsageStatus.SUCCESS
+				),
+				org.assertj.core.groups.Tuple.tuple(
+					AnalysisUsageOperation.AI_ANALYSIS,
+					"mock",
+					AnalysisUsageStatus.SUCCESS
+				)
+			);
 	}
 
 	@Test
@@ -454,6 +474,13 @@ class DocumentUploadIntegrationTest {
 
 		assertThat(document.getAnalysisStatus()).isEqualTo(DocumentAnalysisStatus.OCR_FAILED);
 		assertThat(analysisJob.getStatus()).isEqualTo(AnalysisJobStatus.FAILED);
+		assertThat(analysisUsageLogRepository.findByAnalysisJobIdOrderByIdAsc(analysisJob.getId()))
+			.extracting("operation", "provider", "status")
+			.containsExactly(org.assertj.core.groups.Tuple.tuple(
+				AnalysisUsageOperation.OCR,
+				"UNSUPPORTED_IMAGE",
+				AnalysisUsageStatus.FAILED
+			));
 	}
 
 	@Test

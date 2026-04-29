@@ -32,6 +32,7 @@ Sign up / log in
 - UUID-based local file storage
 - User-owned document list and detail APIs
 - Async analysis job pipeline
+- AI/OCR usage logging foundation
 - PDF text extraction with Apache PDFBox
 - Mock AI document classification and field extraction
 - Optional OpenAI Responses API integration with Structured Outputs
