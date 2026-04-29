@@ -25,7 +25,15 @@ public class SecurityConfig {
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/api/health", "/api/auth/signup", "/api/auth/login", "/h2-console/**").permitAll()
+				.requestMatchers(
+					"/api/health",
+					"/api/auth/signup",
+					"/api/auth/login",
+					"/h2-console/**",
+					"/swagger-ui.html",
+					"/swagger-ui/**",
+					"/v3/api-docs/**"
+				).permitAll()
 				.anyRequest().authenticated())
 			.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()))
 			.httpBasic(httpBasic -> httpBasic.disable())

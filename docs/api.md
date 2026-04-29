@@ -6,6 +6,18 @@ Base URL:
 http://localhost:8080
 ```
 
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+OpenAPI JSON:
+
+```text
+http://localhost:8080/v3/api-docs
+```
+
 All protected APIs require:
 
 ```text

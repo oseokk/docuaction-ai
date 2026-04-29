@@ -81,6 +81,12 @@ Health check:
 curl http://localhost:8080/api/health
 ```
 
+Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
 Run tests:
 
 ```bash

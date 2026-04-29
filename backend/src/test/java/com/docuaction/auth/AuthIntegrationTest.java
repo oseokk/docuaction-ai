@@ -99,5 +99,13 @@ class AuthIntegrationTest {
 			.andExpect(jsonPath("$.success").value(false))
 			.andExpect(jsonPath("$.error.code").value("COMMON_401"));
 	}
+
+	@Test
+	void openApiDocsArePublic() throws Exception {
+		mockMvc.perform(get("/v3/api-docs"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.openapi").exists())
+			.andExpect(jsonPath("$.info.title").value("DocuAction AI API"));
+	}
 }
 
