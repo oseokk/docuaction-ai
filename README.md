@@ -120,6 +120,19 @@ cd backend
 ./gradlew test
 ```
 
+## Mobile MVP
+
+Flutter source lives under `mobile/`.
+
+```bash
+cd mobile
+flutter create --platforms android,ios .
+flutter pub get
+flutter run --dart-define=DOCUACTION_API_BASE_URL=http://10.0.2.2:8080
+```
+
+The current mobile shell includes signup/login, token storage, document upload, document list, and upcoming action list screens.
+
 ## Local Storage
 
 Uploaded files are stored under:
@@ -171,6 +184,10 @@ docuAI/
       document/
       file/
       user/
+  mobile/
+    lib/
+      core/
+      features/
   docs/
 ```
 
