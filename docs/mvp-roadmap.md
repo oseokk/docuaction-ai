@@ -143,9 +143,11 @@ Done when:
 
 Goal: add a mobile client for the end-to-end product experience.
 
-- Flutter project setup - Started on `origin/feature-flutter-app-shell`
-- Login screen
-- Document upload screen
+- Flutter project setup - Done
+- Login screen - Done
+- Token storage - Done
+- Document upload screen - Started
+- Document list screen - Started
+- Upcoming action screen - Started
+- Document detail screen
 - Analysis result review screen
-- Document list/detail screens
-- Upcoming action screen

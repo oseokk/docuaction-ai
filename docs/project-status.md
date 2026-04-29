@@ -1,8 +1,8 @@
 # Project Status
 
-Checked against GitHub `origin/main` on 2026-04-29.
+Checked against GitHub `origin/main` on 2026-04-29, then updated after merging the Flutter app shell into local `main`.
 
-Latest main commit:
+Latest GitHub main commit observed before mobile merge:
 
 ```text
 7cf5980 Add document reanalysis API
@@ -53,6 +53,12 @@ Sign up / log in
 - Action completion
 - Document reanalysis API
 - Swagger/OpenAPI documentation
+- Flutter mobile app shell
+- Mobile signup/login screen
+- Mobile token storage
+- Mobile document upload
+- Mobile document list
+- Mobile upcoming action list
 - README, API docs, architecture docs, and ERD
 
 ## Current Main Branch Boundaries
@@ -62,7 +68,8 @@ Sign up / log in
 - The default local mode still uses mock AI analysis.
 - Local storage is used instead of S3-compatible object storage.
 - Async processing uses Spring `@Async`, not a persistent queue.
-- Flutter mobile work exists on `origin/feature-flutter-app-shell`, but it is not merged into `main`.
+- Flutter document detail and review screens are not implemented yet.
+- Flutter SDK is required locally to run mobile tests and app commands.
 
 ## Remote Branches Observed
 
@@ -78,13 +85,12 @@ origin/feature-refresh-token
 origin/fix-analysis-review-flow
 ```
 
-Most backend feature branches have already been incorporated into `origin/main`. The Flutter app shell branch remains separate.
+Most backend feature branches have already been incorporated into `origin/main`. The Flutter app shell branch has now been merged into local `main` and is ready to push.
 
 ## Recommended Next Work
 
-1. Merge or continue the Flutter app shell.
+1. Expand Flutter document detail and review screens.
 2. Add a real image OCR provider adapter.
 3. Add provider cost estimates to `analysis_usage_logs`.
 4. Replace local file storage with private object storage.
 5. Add demo screenshots or GIFs for portfolio presentation.
-

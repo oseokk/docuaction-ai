@@ -193,7 +193,7 @@ docuAI/
 
 ## Next Milestones
 
-- Merge or continue the Flutter app shell.
+- Expand Flutter document detail and review screens.
 - Add a real image OCR provider adapter.
 - Add provider cost estimates to analysis usage logs.
 - Replace local file storage with private object storage.
