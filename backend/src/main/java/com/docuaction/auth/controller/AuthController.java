@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.docuaction.auth.dto.LoginRequest;
 import com.docuaction.auth.dto.LoginResponse;
+import com.docuaction.auth.dto.RefreshTokenRequest;
 import com.docuaction.auth.dto.SignupRequest;
 import com.docuaction.auth.dto.SignupResponse;
 import com.docuaction.auth.service.AuthService;
@@ -32,6 +33,11 @@ public class AuthController {
 	@PostMapping("/login")
 	public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
 		return ApiResponse.success(authService.login(request));
+	}
+
+	@PostMapping("/refresh")
+	public ApiResponse<LoginResponse> refresh(@Valid @RequestBody RefreshTokenRequest request) {
+		return ApiResponse.success(authService.refresh(request.refreshToken()));
 	}
 }
 

@@ -20,15 +20,18 @@ public class AuthService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider jwtTokenProvider;
+	private final RefreshTokenService refreshTokenService;
 
 	public AuthService(
 		UserRepository userRepository,
 		PasswordEncoder passwordEncoder,
-		JwtTokenProvider jwtTokenProvider
+		JwtTokenProvider jwtTokenProvider,
+		RefreshTokenService refreshTokenService
 	) {
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.jwtTokenProvider = jwtTokenProvider;
+		this.refreshTokenService = refreshTokenService;
 	}
 
 	@Transactional
@@ -56,7 +59,16 @@ public class AuthService {
 		}
 
 		String accessToken = jwtTokenProvider.createAccessToken(user);
-		return new LoginResponse(accessToken, "Bearer");
+		String refreshToken = refreshTokenService.createRefreshToken(user);
+		return new LoginResponse(accessToken, refreshToken, "Bearer");
+	}
+
+	@Transactional
+	public LoginResponse refresh(String refreshToken) {
+		User user = refreshTokenService.consumeAndRotate(refreshToken);
+		String newAccessToken = jwtTokenProvider.createAccessToken(user);
+		String newRefreshToken = refreshTokenService.createRefreshToken(user);
+		return new LoginResponse(newAccessToken, newRefreshToken, "Bearer");
 	}
 }
 

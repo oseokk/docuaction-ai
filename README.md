@@ -25,6 +25,7 @@ Sign up / log in
 - Email/password signup and login
 - BCrypt password hashing
 - JWT access token authentication
+- Refresh token rotation
 - Current user lookup
 - Multipart document upload
 - File extension, MIME type, and 10MB size validation

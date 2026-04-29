@@ -6,6 +6,7 @@ This ERD represents the current backend MVP schema generated from the JPA entiti
 erDiagram
     USERS ||--o{ DOCUMENTS : owns
     USERS ||--o{ DOCUMENT_ACTIONS : owns
+    USERS ||--o{ REFRESH_TOKENS : owns
     DOCUMENTS ||--o{ DOCUMENT_FIELDS : has
     DOCUMENTS ||--o{ DOCUMENT_ACTIONS : creates
     DOCUMENTS ||--o{ ANALYSIS_JOBS : analyzed_by
@@ -15,6 +16,16 @@ erDiagram
         varchar email
         varchar password
         varchar name
+        datetime created_at
+        datetime updated_at
+    }
+
+    REFRESH_TOKENS {
+        bigint refresh_token_id PK
+        bigint user_id FK
+        varchar token_hash
+        datetime expires_at
+        boolean revoked
         datetime created_at
         datetime updated_at
     }
@@ -80,6 +91,7 @@ erDiagram
 ## Notes
 
 - `documents.deleted` supports logical deletion.
+- `refresh_tokens.token_hash` stores a hash of the opaque refresh token, not the original token value.
 - `document_fields` stores user-reviewable extracted values.
 - `analysis_jobs` records the async analysis lifecycle.
 - `document_actions` stores reminders and expense records generated after user review.

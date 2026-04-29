@@ -70,6 +70,74 @@ class AuthIntegrationTest {
 	}
 
 	@Test
+	void refreshTokenRotatesTokens() throws Exception {
+		mockMvc.perform(post("/api/auth/signup")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "email": "refresh@example.com",
+					  "password": "password1234",
+					  "name": "김영석"
+					}
+					"""))
+			.andExpect(status().isOk());
+
+		String loginResponse = mockMvc.perform(post("/api/auth/login")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "email": "refresh@example.com",
+					  "password": "password1234"
+					}
+					"""))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.accessToken").isNotEmpty())
+			.andExpect(jsonPath("$.data.refreshToken").isNotEmpty())
+			.andReturn()
+			.getResponse()
+			.getContentAsString();
+
+		String refreshToken = objectMapper.readTree(loginResponse).path("data").path("refreshToken").asText();
+
+		String refreshResponse = mockMvc.perform(post("/api/auth/refresh")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "refreshToken": "%s"
+					}
+					""".formatted(refreshToken)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.accessToken").isNotEmpty())
+			.andExpect(jsonPath("$.data.refreshToken").isNotEmpty())
+			.andReturn()
+			.getResponse()
+			.getContentAsString();
+
+		String rotatedRefreshToken = objectMapper.readTree(refreshResponse).path("data").path("refreshToken").asText();
+
+		mockMvc.perform(post("/api/auth/refresh")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "refreshToken": "%s"
+					}
+					""".formatted(refreshToken)))
+			.andExpect(status().isUnauthorized())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error.code").value("AUTH_402"));
+
+		mockMvc.perform(post("/api/auth/refresh")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "refreshToken": "%s"
+					}
+					""".formatted(rotatedRefreshToken)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.data.refreshToken").isNotEmpty());
+	}
+
+	@Test
 	void duplicateEmailReturnsConflict() throws Exception {
 		String body = """
 			{

@@ -83,6 +83,27 @@ Response data:
 ```json
 {
   "accessToken": "jwt-token",
+  "refreshToken": "refresh-token",
+  "tokenType": "Bearer"
+}
+```
+
+### `POST /api/auth/refresh`
+
+Issues a new access token and rotates the refresh token.
+
+```json
+{
+  "refreshToken": "refresh-token"
+}
+```
+
+Response data:
+
+```json
+{
+  "accessToken": "new-jwt-token",
+  "refreshToken": "new-refresh-token",
   "tokenType": "Bearer"
 }
 ```
