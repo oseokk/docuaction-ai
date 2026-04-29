@@ -2,34 +2,25 @@ spring:
   application:
     name: DocuAction
 
-  datasource:
-    url: jdbc:h2:mem:docuaction;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
+  profiles:
+    default: local
 
   jpa:
-    hibernate:
-      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
 
-  h2:
-    console:
-      enabled: true
-
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 docuaction:
   jwt:
-    secret: local-development-secret-key-change-before-production-1234567890
-    access-token-expiration-seconds: 3600
+    secret: ${DOCUACTION_JWT_SECRET}
+    access-token-expiration-seconds: ${DOCUACTION_JWT_ACCESS_TOKEN_EXPIRATION_SECONDS:3600}
   storage:
-    document-path: ./storage/documents
+    document-path: ${DOCUACTION_STORAGE_DOCUMENT_PATH:./storage/documents}
   ai:
     provider: ${DOCUACTION_AI_PROVIDER:mock}
   openai:
     api-key: ${OPENAI_API_KEY:}
-    model: gpt-5.2
+    model: ${DOCUACTION_OPENAI_MODEL:gpt-5.2}

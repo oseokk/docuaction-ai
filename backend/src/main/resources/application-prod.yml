@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: ${DOCUACTION_DB_URL}
+    username: ${DOCUACTION_DB_USERNAME}
+    password: ${DOCUACTION_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  h2:
+    console:
+      enabled: false

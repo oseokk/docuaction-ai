@@ -66,14 +66,30 @@ DOCUACTION_AI_PROVIDER=openai
 OPENAI_API_KEY=your_api_key
 ```
 
-The OpenAI adapter uses the Responses API with JSON schema structured output. The default model is configured in `backend/src/main/resources/application.yml`.
+The OpenAI adapter uses the Responses API with JSON schema structured output. The default model is configured through `DOCUACTION_OPENAI_MODEL`.
+
+## Environment Profiles
+
+- `local`: H2 database, H2 console enabled, local file storage, development JWT secret fallback.
+- `prod`: PostgreSQL from environment variables, H2 console disabled, JWT secret required.
 
 ## Run Locally
+
+The default Spring profile is `local`.
 
 ```bash
 cd backend
 ./gradlew bootRun
 ```
+
+Production-like run:
+
+```bash
+cd backend
+SPRING_PROFILES_ACTIVE=prod ./gradlew bootRun
+```
+
+Required production variables are listed in `.env.example`.
 
 Health check:
 
