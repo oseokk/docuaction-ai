@@ -9,5 +9,7 @@ import com.docuaction.analysis.entity.AnalysisJob;
 public interface AnalysisJobRepository extends JpaRepository<AnalysisJob, Long> {
 
 	Optional<AnalysisJob> findTopByDocumentIdOrderByCreatedAtDesc(Long documentId);
+
+	long countByDocumentId(Long documentId);
 }
 

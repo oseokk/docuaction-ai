@@ -180,6 +180,15 @@ public class Document {
 		this.analysisStatus = DocumentAnalysisStatus.PROCESSING;
 	}
 
+	public void prepareReanalysis() {
+		this.documentType = DocumentType.UNKNOWN;
+		this.analysisStatus = DocumentAnalysisStatus.UPLOADED;
+		this.title = originalFileName;
+		this.summary = null;
+		this.confidence = null;
+		this.ocrText = null;
+	}
+
 	public void markNeedsReview() {
 		this.analysisStatus = DocumentAnalysisStatus.NEEDS_REVIEW;
 	}

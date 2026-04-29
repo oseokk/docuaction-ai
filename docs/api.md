@@ -201,6 +201,18 @@ Request:
 
 Review completion changes document status to `COMPLETED` and regenerates actions.
 
+### `POST /api/documents/{documentId}/reanalyze`
+
+Starts a new async analysis job for an existing document.
+
+Behavior:
+
+- Resets document analysis metadata.
+- Deletes existing extracted fields.
+- Deletes existing generated actions.
+- Reuses the original uploaded file.
+- Returns `UPLOADED`, then analysis proceeds asynchronously.
+
 ### `DELETE /api/documents/{documentId}`
 
 Performs logical deletion.

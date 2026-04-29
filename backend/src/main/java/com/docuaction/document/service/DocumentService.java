@@ -109,4 +109,21 @@ public class DocumentService {
 
 		return new DocumentDeleteResponse(document.getId(), "Document deleted.");
 	}
+
+	@Transactional
+	public DocumentUploadResponse reanalyzeDocument(Long documentId, Long userId) {
+		Document document = documentRepository.findByIdAndUserIdAndDeletedFalse(documentId, userId)
+			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Document not found."));
+
+		document.prepareReanalysis();
+		documentFieldRepository.deleteByDocumentId(document.getId());
+		documentActionRepository.deleteByDocumentId(document.getId());
+		analysisJobService.createAndStartAfterCommit(document, document.getUser());
+
+		return new DocumentUploadResponse(
+			document.getId(),
+			document.getAnalysisStatus().name(),
+			"Document reanalysis is ready to start."
+		);
+	}
 }

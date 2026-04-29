@@ -26,6 +26,7 @@ import com.docuaction.analysis.entity.AnalysisUsageOperation;
 import com.docuaction.analysis.entity.AnalysisUsageStatus;
 import com.docuaction.analysis.repository.AnalysisJobRepository;
 import com.docuaction.analysis.repository.AnalysisUsageLogRepository;
+import com.docuaction.action.repository.DocumentActionRepository;
 import com.docuaction.document.entity.Document;
 import com.docuaction.document.entity.DocumentAnalysisStatus;
 import com.docuaction.document.entity.DocumentType;
@@ -60,6 +61,9 @@ class DocumentUploadIntegrationTest {
 
 	@Autowired
 	private DocumentFieldRepository documentFieldRepository;
+
+	@Autowired
+	private DocumentActionRepository documentActionRepository;
 
 	@Autowired
 	private AnalysisJobRepository analysisJobRepository;
@@ -427,6 +431,52 @@ class DocumentUploadIntegrationTest {
 					  "fields": []
 					}
 					"""))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error.code").value("COMMON_404"));
+	}
+
+	@Test
+	void reanalyzeDocumentClearsReviewDataAndStartsNewAnalysisJob() throws Exception {
+		String accessToken = signupAndLogin("reanalyze@example.com");
+		Long documentId = upload(accessToken, "reanalyze.pdf", "Electric bill amount 72300 due 2026-05-10");
+		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+		reviewBill(accessToken, documentId);
+
+		assertThat(documentFieldRepository.findByDocumentIdOrderByIdAsc(documentId)).isNotEmpty();
+		assertThat(documentActionRepository.findByDocumentIdOrderByActionDateAscIdAsc(documentId)).isNotEmpty();
+		assertThat(analysisJobRepository.countByDocumentId(documentId)).isEqualTo(1);
+
+		mockMvc.perform(post("/api/documents/{documentId}/reanalyze", documentId)
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.documentId").value(documentId))
+			.andExpect(jsonPath("$.data.status").value("UPLOADED"));
+
+		Document document = awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+
+		assertThat(document.getAnalysisStatus()).isEqualTo(DocumentAnalysisStatus.NEEDS_REVIEW);
+		assertThat(document.getDocumentType()).isEqualTo(DocumentType.BILL);
+		assertThat(document.getSummary()).contains("납부");
+		assertThat(documentFieldRepository.findByDocumentIdOrderByIdAsc(documentId))
+			.extracting("fieldKey", "fieldValue")
+			.contains(
+				org.assertj.core.groups.Tuple.tuple("amount", "72300"),
+				org.assertj.core.groups.Tuple.tuple("dueDate", "2026-05-10")
+			);
+		assertThat(documentActionRepository.findByDocumentIdOrderByActionDateAscIdAsc(documentId)).isEmpty();
+		assertThat(analysisJobRepository.countByDocumentId(documentId)).isEqualTo(2);
+	}
+
+	@Test
+	void reanalyzeOtherUsersDocumentReturnsNotFound() throws Exception {
+		String ownerToken = signupAndLogin("reanalyze-owner@example.com");
+		String otherToken = signupAndLogin("reanalyze-other@example.com");
+		Long documentId = upload(ownerToken, "private-reanalyze.pdf");
+
+		mockMvc.perform(post("/api/documents/{documentId}/reanalyze", documentId)
+				.header("Authorization", "Bearer " + otherToken))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.success").value(false))
 			.andExpect(jsonPath("$.error.code").value("COMMON_404"));

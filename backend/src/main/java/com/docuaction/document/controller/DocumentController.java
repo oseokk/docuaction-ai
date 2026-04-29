@@ -79,6 +79,12 @@ public class DocumentController {
 		return ApiResponse.success(documentReviewService.review(documentId, userId, request));
 	}
 
+	@PostMapping("/{documentId}/reanalyze")
+	public ApiResponse<DocumentUploadResponse> reanalyze(@PathVariable Long documentId) {
+		Long userId = SecurityUtils.currentUser().userId();
+		return ApiResponse.success(documentService.reanalyzeDocument(documentId, userId));
+	}
+
 	@DeleteMapping("/{documentId}")
 	public ApiResponse<DocumentDeleteResponse> deleteDocument(@PathVariable Long documentId) {
 		Long userId = SecurityUtils.currentUser().userId();

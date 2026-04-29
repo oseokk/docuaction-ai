@@ -32,6 +32,7 @@ Sign up / log in
 - UUID-based local file storage
 - User-owned document list and detail APIs
 - Async analysis job pipeline
+- Document reanalysis request API
 - AI/OCR usage logging foundation
 - PDF text extraction with Apache PDFBox
 - Pluggable text extraction provider structure
