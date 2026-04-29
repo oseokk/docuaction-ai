@@ -6,6 +6,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.docuaction.common.response.ApiError;
 import com.docuaction.common.response.ApiResponse;
@@ -27,6 +28,13 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(ErrorCode.INVALID_REQUEST.getStatus())
 			.body(ApiResponse.error(ApiError.of(ErrorCode.INVALID_REQUEST, "Request validation failed.")));
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ApiResponse<Void>> handleTypeMismatchException() {
+		return ResponseEntity
+			.status(ErrorCode.INVALID_REQUEST.getStatus())
+			.body(ApiResponse.error(ApiError.of(ErrorCode.INVALID_REQUEST, "Invalid request parameter.")));
 	}
 
 	@ExceptionHandler(AccessDeniedException.class)

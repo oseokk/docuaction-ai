@@ -23,6 +23,8 @@ import com.docuaction.document.dto.DocumentListResponse;
 import com.docuaction.document.dto.DocumentReviewRequest;
 import com.docuaction.document.dto.DocumentReviewResponse;
 import com.docuaction.document.dto.DocumentUploadResponse;
+import com.docuaction.document.entity.DocumentAnalysisStatus;
+import com.docuaction.document.entity.DocumentType;
 import com.docuaction.document.service.DocumentReviewService;
 import com.docuaction.document.service.DocumentService;
 
@@ -52,11 +54,13 @@ public class DocumentController {
 	@GetMapping
 	public ApiResponse<PageResponse<DocumentListResponse>> getDocuments(
 		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "20") int size
+		@RequestParam(defaultValue = "20") int size,
+		@RequestParam(required = false) DocumentType type,
+		@RequestParam(required = false) DocumentAnalysisStatus status
 	) {
 		Long userId = SecurityUtils.currentUser().userId();
 		PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-		Page<DocumentListResponse> documents = documentService.getDocuments(userId, pageRequest);
+		Page<DocumentListResponse> documents = documentService.getDocuments(userId, type, status, pageRequest);
 		return ApiResponse.success(PageResponse.from(documents));
 	}
 

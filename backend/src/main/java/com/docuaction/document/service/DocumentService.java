@@ -16,6 +16,8 @@ import com.docuaction.document.dto.DocumentDeleteResponse;
 import com.docuaction.document.dto.DocumentListResponse;
 import com.docuaction.document.dto.DocumentUploadResponse;
 import com.docuaction.document.entity.Document;
+import com.docuaction.document.entity.DocumentAnalysisStatus;
+import com.docuaction.document.entity.DocumentType;
 import com.docuaction.document.repository.DocumentRepository;
 import com.docuaction.document.repository.DocumentFieldRepository;
 import com.docuaction.file.service.StoredFile;
@@ -74,8 +76,13 @@ public class DocumentService {
 		);
 	}
 
-	public Page<DocumentListResponse> getDocuments(Long userId, Pageable pageable) {
-		return documentRepository.findByUserIdAndDeletedFalse(userId, pageable)
+	public Page<DocumentListResponse> getDocuments(
+		Long userId,
+		DocumentType documentType,
+		DocumentAnalysisStatus analysisStatus,
+		Pageable pageable
+	) {
+		return documentRepository.findUserDocuments(userId, documentType, analysisStatus, pageable)
 			.map(DocumentListResponse::from);
 	}
 

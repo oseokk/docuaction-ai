@@ -119,9 +119,14 @@ Response data:
 
 After upload, an async analysis job starts. PDF files are parsed with PDFBox. The default local mode uses a mock AI analyzer. If `DOCUACTION_AI_PROVIDER=openai` and `OPENAI_API_KEY` are configured, the OpenAI adapter calls the Responses API with structured JSON output.
 
-### `GET /api/documents?page=0&size=20`
+### `GET /api/documents?page=0&size=20&type=BILL&status=NEEDS_REVIEW`
 
 Returns only the authenticated user's non-deleted documents.
+
+Optional filters:
+
+- `type`: one of the document types listed below
+- `status`: one of the document statuses listed below
 
 ### `GET /api/documents/{documentId}`
 

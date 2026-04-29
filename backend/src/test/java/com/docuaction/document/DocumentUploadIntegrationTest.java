@@ -142,6 +142,55 @@ class DocumentUploadIntegrationTest {
 	}
 
 	@Test
+	void getDocumentsFiltersByTypeAndStatus() throws Exception {
+		String accessToken = signupAndLogin("filter@example.com");
+		Long billDocumentId = upload(accessToken, "filter-bill.pdf", "Electric bill amount 72300 due 2026-05-10");
+		Long contractDocumentId = upload(accessToken, "filter-contract.pdf", "Rental contract ends 2027-04-30");
+		Long imageDocumentId = upload(accessToken, "filter-receipt.png");
+
+		awaitDocumentStatus(billDocumentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+		awaitDocumentStatus(contractDocumentId, DocumentAnalysisStatus.NEEDS_REVIEW);
+		awaitDocumentStatus(imageDocumentId, DocumentAnalysisStatus.OCR_FAILED);
+
+		mockMvc.perform(get("/api/documents")
+				.param("type", "BILL")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.totalElements").value(1))
+			.andExpect(jsonPath("$.data.content[0].documentId").value(billDocumentId));
+
+		mockMvc.perform(get("/api/documents")
+				.param("status", "OCR_FAILED")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.totalElements").value(1))
+			.andExpect(jsonPath("$.data.content[0].documentId").value(imageDocumentId));
+
+		mockMvc.perform(get("/api/documents")
+				.param("type", "CONTRACT")
+				.param("status", "NEEDS_REVIEW")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.totalElements").value(1))
+			.andExpect(jsonPath("$.data.content[0].documentId").value(contractDocumentId));
+	}
+
+	@Test
+	void getDocumentsWithInvalidFilterReturnsBadRequest() throws Exception {
+		String accessToken = signupAndLogin("invalid-filter@example.com");
+
+		mockMvc.perform(get("/api/documents")
+				.param("type", "NOPE")
+				.header("Authorization", "Bearer " + accessToken))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error.code").value("COMMON_400"));
+	}
+
+	@Test
 	void getDocumentReturnsCurrentUsersDocumentDetail() throws Exception {
 		String accessToken = signupAndLogin("detail@example.com");
 		Long documentId = upload(accessToken, "contract.pdf");
