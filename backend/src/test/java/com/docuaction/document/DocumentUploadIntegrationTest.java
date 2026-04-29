@@ -395,6 +395,40 @@ class DocumentUploadIntegrationTest {
 			.andExpect(jsonPath("$.error.code").value("DOCUMENT_400"));
 	}
 
+	@Test
+	void imageUploadFailsAnalysisUntilImageOcrProviderIsAdded() throws Exception {
+		String accessToken = signupAndLogin("image-ocr@example.com");
+		Long documentId = upload(accessToken, "receipt.png");
+
+		Document document = awaitDocumentStatus(documentId, DocumentAnalysisStatus.OCR_FAILED);
+		AnalysisJob analysisJob = analysisJobRepository.findTopByDocumentIdOrderByCreatedAtDesc(documentId).orElseThrow();
+
+		assertThat(document.getAnalysisStatus()).isEqualTo(DocumentAnalysisStatus.OCR_FAILED);
+		assertThat(analysisJob.getStatus()).isEqualTo(AnalysisJobStatus.FAILED);
+	}
+
+	@Test
+	void reviewDocumentThatIsNotReadyReturnsBadRequest() throws Exception {
+		String accessToken = signupAndLogin("review-not-ready@example.com");
+		Long documentId = upload(accessToken, "not-ready.png");
+		awaitDocumentStatus(documentId, DocumentAnalysisStatus.OCR_FAILED);
+
+		mockMvc.perform(post("/api/documents/{documentId}/review", documentId)
+				.header("Authorization", "Bearer " + accessToken)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content("""
+					{
+					  "documentType": "BILL",
+					  "title": "전기요금 고지서",
+					  "summary": "검토 완료",
+					  "fields": []
+					}
+					"""))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.error.code").value("COMMON_400"));
+	}
+
 	private String signupAndLogin(String email) throws Exception {
 		mockMvc.perform(post("/api/auth/signup")
 				.contentType(MediaType.APPLICATION_JSON)

@@ -62,7 +62,6 @@ public class DocumentAnalysisAsyncService {
 		} catch (RuntimeException exception) {
 			document.markFailed(DocumentAnalysisStatus.FAILED);
 			analysisJob.markFailed("ANALYSIS_FAILED", exception.getMessage());
-			throw exception;
 		}
 	}
 }

@@ -20,8 +20,7 @@ public class TextExtractionService {
 			return pdfTextExtractor.extract(document.getFilePath());
 		}
 
-		// Image OCR provider integration will be added in a later phase.
-		return "";
+		throw new TextExtractionException("Image OCR is not supported yet.");
 	}
 }
 

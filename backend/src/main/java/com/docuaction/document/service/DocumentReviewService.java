@@ -11,6 +11,7 @@ import com.docuaction.common.response.ErrorCode;
 import com.docuaction.document.dto.DocumentReviewRequest;
 import com.docuaction.document.dto.DocumentReviewResponse;
 import com.docuaction.document.entity.Document;
+import com.docuaction.document.entity.DocumentAnalysisStatus;
 import com.docuaction.document.entity.DocumentField;
 import com.docuaction.document.repository.DocumentFieldRepository;
 import com.docuaction.document.repository.DocumentRepository;
@@ -37,6 +38,10 @@ public class DocumentReviewService {
 	public DocumentReviewResponse review(Long documentId, Long userId, DocumentReviewRequest request) {
 		Document document = documentRepository.findByIdAndUserIdAndDeletedFalse(documentId, userId)
 			.orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND, "Document not found."));
+
+		if (document.getAnalysisStatus() != DocumentAnalysisStatus.NEEDS_REVIEW) {
+			throw new BusinessException(ErrorCode.INVALID_REQUEST, "Document is not ready for review.");
+		}
 
 		document.completeReview(request.documentType(), request.title(), request.summary());
 		List<DocumentField> fields = replaceFields(document, request.fieldsOrEmpty());
