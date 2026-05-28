@@ -144,10 +144,13 @@ Done when:
 Goal: add a mobile client for the end-to-end product experience.
 
 - Flutter project setup - Done
+- Flutter dependency lockfile - Done
+- Local iOS/macOS Flutter tooling - Done
 - Login screen - Done
 - Token storage - Done
 - Document upload screen - Started
 - Document list screen - Started
 - Upcoming action screen - Started
+- Android SDK setup
 - Document detail screen
 - Analysis result review screen

@@ -54,6 +54,8 @@ Sign up / log in
 - PostgreSQL driver included for production-like migration
 - Apache PDFBox
 - Gradle Wrapper
+- Flutter 3.41
+- Xcode 16.4 and CocoaPods for iOS/macOS Flutter development
 
 ## AI Provider Configuration
 
@@ -126,10 +128,11 @@ Flutter source lives under `mobile/`.
 
 ```bash
 cd mobile
-flutter create --platforms android,ios .
 flutter pub get
 flutter run --dart-define=DOCUACTION_API_BASE_URL=http://10.0.2.2:8080
 ```
+
+Use `http://10.0.2.2:8080` for Android emulator and `http://localhost:8080` for iOS simulator, macOS, and web local runs.
 
 The current mobile shell includes signup/login, token storage, document upload, document list, and upcoming action list screens.
 
@@ -194,6 +197,7 @@ docuAI/
 ## Next Milestones
 
 - Expand Flutter document detail and review screens.
+- Add Android SDK setup for Android emulator builds.
 - Add a real image OCR provider adapter.
 - Add provider cost estimates to analysis usage logs.
 - Replace local file storage with private object storage.

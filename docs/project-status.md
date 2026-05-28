@@ -2,6 +2,8 @@
 
 Checked against GitHub `origin/main` on 2026-04-29, then updated after merging the Flutter app shell into local `main`.
 
+Updated on 2026-05-29 after local Flutter/iOS tooling setup.
+
 Latest GitHub main commit observed before mobile merge:
 
 ```text
@@ -59,6 +61,7 @@ Sign up / log in
 - Mobile document upload
 - Mobile document list
 - Mobile upcoming action list
+- Mobile dependency lockfile
 - README, API docs, architecture docs, and ERD
 
 ## Current Main Branch Boundaries
@@ -69,7 +72,8 @@ Sign up / log in
 - Local storage is used instead of S3-compatible object storage.
 - Async processing uses Spring `@Async`, not a persistent queue.
 - Flutter document detail and review screens are not implemented yet.
-- Flutter SDK is required locally to run mobile tests and app commands.
+- Flutter 3.41.8, Xcode 16.4, and CocoaPods 1.16.2 are configured locally.
+- Android SDK is not configured yet, so Android emulator builds are still pending.
 
 ## Remote Branches Observed
 
@@ -90,7 +94,8 @@ Most backend feature branches have already been incorporated into `origin/main`.
 ## Recommended Next Work
 
 1. Expand Flutter document detail and review screens.
-2. Add a real image OCR provider adapter.
-3. Add provider cost estimates to `analysis_usage_logs`.
-4. Replace local file storage with private object storage.
-5. Add demo screenshots or GIFs for portfolio presentation.
+2. Add Android SDK setup for Android emulator builds.
+3. Add a real image OCR provider adapter.
+4. Add provider cost estimates to `analysis_usage_logs`.
+5. Replace local file storage with private object storage.
+6. Add demo screenshots or GIFs for portfolio presentation.
