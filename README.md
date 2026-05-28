@@ -155,6 +155,7 @@ See [docs/api.md](docs/api.md).
 - [Architecture](docs/architecture.md)
 - [ERD](docs/erd.md)
 - [Project Status](docs/project-status.md)
+- [App Release Checklist](docs/app-release-checklist.md)
 
 ## Product Direction
 

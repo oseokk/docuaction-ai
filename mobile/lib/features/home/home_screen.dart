@@ -9,6 +9,7 @@ import '../auth/auth_repository.dart';
 import '../documents/document_detail_screen.dart';
 import '../documents/document_models.dart';
 import '../documents/document_repository.dart';
+import '../documents/document_status.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({
@@ -99,13 +100,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
                 if (snapshot.hasError) {
-                  return Text('문서 목록을 불러오지 못했습니다: ${snapshot.error}');
+                  return _StatePanel(
+                    icon: Icons.wifi_off_outlined,
+                    title: '문서 목록을 불러오지 못했습니다.',
+                    message: snapshot.error.toString(),
+                  );
                 }
                 final documents = snapshot.data ?? [];
                 if (documents.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 32),
-                    child: Text('아직 업로드한 문서가 없습니다.'),
+                  return const _StatePanel(
+                    icon: Icons.upload_file_outlined,
+                    title: '아직 업로드한 문서가 없습니다.',
+                    message: '고지서, 영수증, 계약서 PDF나 이미지를 업로드하면 분석이 시작됩니다.',
                   );
                 }
                 return Column(
@@ -196,11 +202,71 @@ class _DocumentTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         onTap: onTap,
-        title: Text(document.title),
-        subtitle: Text(
-          '${document.documentType} · ${document.analysisStatus}\n${document.originalFileName}',
+        title: Text(
+          document.title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  DocumentStatusChip(status: document.analysisStatus),
+                  Chip(label: Text(documentTypeLabel(document.documentType))),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                document.originalFileName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
         trailing: const Icon(Icons.chevron_right),
+      ),
+    );
+  }
+}
+
+class _StatePanel extends StatelessWidget {
+  const _StatePanel({
+    required this.icon,
+    required this.title,
+    required this.message,
+  });
+
+  final IconData icon;
+  final String title;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.primary;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 28),
+      child: Column(
+        children: [
+          Icon(icon, size: 44, color: color),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
       ),
     );
   }

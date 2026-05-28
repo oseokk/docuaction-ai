@@ -65,7 +65,7 @@ Sign up / log in
 - Mobile analysis result review screen
 - Mobile web and macOS runner setup
 - Mobile dependency lockfile
-- README, API docs, architecture docs, and ERD
+- README, API docs, architecture docs, ERD, and app release checklist
 
 ## Current Main Branch Boundaries
 
@@ -99,7 +99,8 @@ Most backend feature branches have already been incorporated into `origin/main`.
 
 1. Polish Flutter empty, loading, and failure states for the demo loop.
 2. Add Android SDK setup for Android emulator builds.
-3. Add a real image OCR provider adapter.
-4. Add provider cost estimates to `analysis_usage_logs`.
-5. Replace local file storage with private object storage.
-6. Add demo screenshots or GIFs for portfolio presentation.
+3. Add privacy policy and terms draft for future app distribution.
+4. Add a real image OCR provider adapter.
+5. Add provider cost estimates to `analysis_usage_logs`.
+6. Replace local file storage with private object storage.
+7. Add demo screenshots or GIFs for portfolio presentation.

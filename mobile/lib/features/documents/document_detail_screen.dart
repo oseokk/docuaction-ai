@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/network/api_client.dart';
 import 'document_models.dart';
 import 'document_repository.dart';
+import 'document_status.dart';
 
 class DocumentDetailScreen extends StatefulWidget {
   const DocumentDetailScreen({
@@ -113,6 +114,8 @@ class _DocumentDetailBodyState extends State<_DocumentDetailBody> {
         padding: const EdgeInsets.all(16),
         children: [
           _Header(detail: detail),
+          const SizedBox(height: 12),
+          _StatusBanner(detail: detail),
           const SizedBox(height: 16),
           TextField(
             controller: _titleController,
@@ -179,7 +182,7 @@ class _DocumentDetailBodyState extends State<_DocumentDetailBody> {
             ),
           if (_message != null) ...[
             const SizedBox(height: 12),
-            Text(_message!),
+            _InlineMessage(message: _message!),
           ],
           const SizedBox(height: 24),
           if (detail.canReview)
@@ -193,6 +196,14 @@ class _DocumentDetailBodyState extends State<_DocumentDetailBody> {
                   : const Icon(Icons.check_circle_outline),
               label: const Text('검수 완료'),
             ),
+          if (!detail.canReview && detail.analysisStatus != 'COMPLETED') ...[
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: widget.onReload,
+              icon: const Icon(Icons.refresh),
+              label: const Text('새로고침'),
+            ),
+          ],
           const SizedBox(height: 28),
           Text(
             '생성된 액션',
@@ -279,8 +290,8 @@ class _Header extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            Chip(label: Text(detail.analysisStatus)),
-            Chip(label: Text(detail.documentType)),
+            DocumentStatusChip(status: detail.analysisStatus),
+            Chip(label: Text(documentTypeLabel(detail.documentType))),
             if (confidence != null)
               Chip(label: Text('신뢰도 ${(confidence * 100).round()}%')),
           ],
@@ -295,6 +306,74 @@ class _Header extends StatelessWidget {
     if (bytes < 1024) return '$bytes B';
     if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
     return '${(bytes / 1024 / 1024).toStringAsFixed(1)} MB';
+  }
+}
+
+class _StatusBanner extends StatelessWidget {
+  const _StatusBanner({required this.detail});
+
+  final DocumentDetail detail;
+
+  @override
+  Widget build(BuildContext context) {
+    final info = documentStatusInfo(detail.analysisStatus);
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: info.color.withValues(alpha: 0.08),
+        border: Border.all(color: info.color.withValues(alpha: 0.25)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(info.icon, color: info.color),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  info.label,
+                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: info.color,
+                        fontWeight: FontWeight.w700,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(info.description),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InlineMessage extends StatelessWidget {
+  const _InlineMessage({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = Theme.of(context).colorScheme.primary;
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        border: Border.all(color: color.withValues(alpha: 0.24)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: color),
+          const SizedBox(width: 8),
+          Expanded(child: Text(message)),
+        ],
+      ),
+    );
   }
 }
 
