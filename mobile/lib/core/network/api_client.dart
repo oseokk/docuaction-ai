@@ -57,7 +57,8 @@ class ApiClient {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       final error = decoded['error'];
       if (error is Map<String, dynamic>) {
-        throw ApiException(error['message']?.toString() ?? 'API request failed.');
+        throw ApiException(
+            error['message']?.toString() ?? 'API request failed.');
       }
       throw ApiException('API request failed.');
     }

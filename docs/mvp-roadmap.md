@@ -151,6 +151,6 @@ Goal: add a mobile client for the end-to-end product experience.
 - Document upload screen - Started
 - Document list screen - Started
 - Upcoming action screen - Started
+- Document detail screen - Done
+- Analysis result review screen - Done
 - Android SDK setup
-- Document detail screen
-- Analysis result review screen

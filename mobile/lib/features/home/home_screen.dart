@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../core/network/api_client.dart';
 import '../actions/action_list_screen.dart';
 import '../auth/auth_repository.dart';
+import '../documents/document_detail_screen.dart';
 import '../documents/document_models.dart';
 import '../documents/document_repository.dart';
 
@@ -108,7 +109,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   );
                 }
                 return Column(
-                  children: documents.map(_DocumentTile.new).toList(),
+                  children: documents
+                      .map(
+                        (document) => _DocumentTile(
+                          document: document,
+                          onTap: () => _openDocument(document.documentId),
+                        ),
+                      )
+                      .toList(),
                 );
               },
             ),
@@ -119,7 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _reload() async {
-    setState(() => _documentsFuture = widget.documentRepository.fetchDocuments());
+    setState(
+        () => _documentsFuture = widget.documentRepository.fetchDocuments());
     await _documentsFuture;
   }
 
@@ -158,20 +167,39 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  Future<void> _openDocument(int documentId) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DocumentDetailScreen(
+          documentId: documentId,
+          documentRepository: widget.documentRepository,
+        ),
+      ),
+    );
+    if (mounted) await _reload();
+  }
 }
 
 class _DocumentTile extends StatelessWidget {
-  const _DocumentTile(this.document);
+  const _DocumentTile({
+    required this.document,
+    required this.onTap,
+  });
 
   final DocumentListItem document;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
+        onTap: onTap,
         title: Text(document.title),
-        subtitle: Text('${document.documentType} · ${document.analysisStatus}'),
+        subtitle: Text(
+          '${document.documentType} · ${document.analysisStatus}\n${document.originalFileName}',
+        ),
         trailing: const Icon(Icons.chevron_right),
       ),
     );

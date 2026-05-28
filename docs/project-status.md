@@ -61,6 +61,8 @@ Sign up / log in
 - Mobile document upload
 - Mobile document list
 - Mobile upcoming action list
+- Mobile document detail screen
+- Mobile analysis result review screen
 - Mobile dependency lockfile
 - README, API docs, architecture docs, and ERD
 
@@ -71,7 +73,7 @@ Sign up / log in
 - The default local mode still uses mock AI analysis.
 - Local storage is used instead of S3-compatible object storage.
 - Async processing uses Spring `@Async`, not a persistent queue.
-- Flutter document detail and review screens are not implemented yet.
+- Flutter app still needs stronger empty, loading, and failure states for demo polish.
 - Flutter 3.41.8, Xcode 16.4, and CocoaPods 1.16.2 are configured locally.
 - Android SDK is not configured yet, so Android emulator builds are still pending.
 
@@ -93,7 +95,7 @@ Most backend feature branches have already been incorporated into `origin/main`.
 
 ## Recommended Next Work
 
-1. Expand Flutter document detail and review screens.
+1. Polish Flutter empty, loading, and failure states for the demo loop.
 2. Add Android SDK setup for Android emulator builds.
 3. Add a real image OCR provider adapter.
 4. Add provider cost estimates to `analysis_usage_logs`.
