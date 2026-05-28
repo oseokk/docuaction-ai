@@ -13,9 +13,10 @@ DocuAction AI is being built as both a portfolio project and a future distributa
 
 ## Privacy And Trust
 
-- Privacy policy drafted and hosted
-- Terms of service drafted and hosted
+- Privacy policy drafted
+- Terms of service drafted
 - AI result disclaimer added to onboarding or review flow
+- Privacy policy and terms hosted
 - User review requirement explained before actions become active
 - Contact/support email configured
 - Account deletion request path defined
