@@ -129,10 +129,10 @@ Flutter source lives under `mobile/`.
 ```bash
 cd mobile
 flutter pub get
-flutter run --dart-define=DOCUACTION_API_BASE_URL=http://10.0.2.2:8080
+flutter run -d chrome --dart-define=DOCUACTION_API_BASE_URL=http://localhost:8080
 ```
 
-Use `http://10.0.2.2:8080` for Android emulator and `http://localhost:8080` for iOS simulator, macOS, and web local runs.
+Use `http://10.0.2.2:8080` for Android emulator and `http://localhost:8080` for iOS simulator, macOS, and web local runs. The repository includes Flutter web and macOS runner files.
 
 The current mobile shell includes signup/login, token storage, document upload, document list, and upcoming action list screens.
 

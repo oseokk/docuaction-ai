@@ -83,7 +83,7 @@ class DocumentUploadIntegrationTest {
 			"file",
 			"bill.pdf",
 			"application/pdf",
-			createPdfBytes("Electric bill amount 72300 due 2026-05-10")
+				createPdfBytes("Electric bill amount 72300 due 2026-06-15")
 		);
 
 		String response = mockMvc.perform(multipart("/api/documents/upload")
@@ -113,20 +113,20 @@ class DocumentUploadIntegrationTest {
 	@Test
 	void uploadDocumentEventuallyStartsAnalysis() throws Exception {
 		String accessToken = signupAndLogin("analysis@example.com");
-		Long documentId = upload(accessToken, "analysis.pdf", "Electric bill amount 72300 due 2026-05-10");
+		Long documentId = upload(accessToken, "analysis.pdf", "Electric bill amount 72300 due 2026-06-15");
 
 		Document document = awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
 		AnalysisJob analysisJob = analysisJobRepository.findTopByDocumentIdOrderByCreatedAtDesc(documentId).orElseThrow();
 
 		assertThat(document.getAnalysisStatus()).isEqualTo(DocumentAnalysisStatus.NEEDS_REVIEW);
-		assertThat(document.getOcrText()).contains("Electric bill amount 72300 due 2026-05-10");
+		assertThat(document.getOcrText()).contains("Electric bill amount 72300 due 2026-06-15");
 		assertThat(document.getDocumentType()).isEqualTo(DocumentType.BILL);
 		assertThat(document.getSummary()).contains("납부");
 		assertThat(documentFieldRepository.findByDocumentIdOrderByIdAsc(documentId))
 			.extracting("fieldKey", "fieldValue")
 			.contains(
 				org.assertj.core.groups.Tuple.tuple("amount", "72300"),
-				org.assertj.core.groups.Tuple.tuple("dueDate", "2026-05-10")
+					org.assertj.core.groups.Tuple.tuple("dueDate", "2026-06-15")
 			);
 		assertThat(analysisJob.getStatus()).isEqualTo(AnalysisJobStatus.COMPLETED);
 		assertThat(analysisUsageLogRepository.findByAnalysisJobIdOrderByIdAsc(analysisJob.getId()))
@@ -168,7 +168,7 @@ class DocumentUploadIntegrationTest {
 	@Test
 	void getDocumentsFiltersByTypeAndStatus() throws Exception {
 		String accessToken = signupAndLogin("filter@example.com");
-		Long billDocumentId = upload(accessToken, "filter-bill.pdf", "Electric bill amount 72300 due 2026-05-10");
+		Long billDocumentId = upload(accessToken, "filter-bill.pdf", "Electric bill amount 72300 due 2026-06-15");
 		Long contractDocumentId = upload(accessToken, "filter-contract.pdf", "Rental contract ends 2027-04-30");
 		Long imageDocumentId = upload(accessToken, "filter-receipt.png");
 
@@ -246,7 +246,7 @@ class DocumentUploadIntegrationTest {
 	@Test
 	void reviewDocumentCompletesAnalysisAndReplacesFields() throws Exception {
 		String accessToken = signupAndLogin("review@example.com");
-		Long documentId = upload(accessToken, "review.pdf", "Electric bill amount 72300 due 2026-05-10");
+		Long documentId = upload(accessToken, "review.pdf", "Electric bill amount 72300 due 2026-06-15");
 		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
 
 		mockMvc.perform(post("/api/documents/{documentId}/review", documentId)
@@ -255,7 +255,7 @@ class DocumentUploadIntegrationTest {
 				.content("""
 					{
 					  "documentType": "BILL",
-					  "title": "4월 전기요금 고지서",
+						  "title": "6월 전기요금 고지서",
 					  "summary": "사용자가 검수한 고지서입니다.",
 					  "fields": [
 					    {
@@ -273,7 +273,7 @@ class DocumentUploadIntegrationTest {
 					    {
 					      "key": "dueDate",
 					      "label": "납부기한",
-					      "value": "2026-05-11",
+						      "value": "2026-06-15",
 					      "type": "DATE"
 					    }
 					  ]
@@ -287,14 +287,14 @@ class DocumentUploadIntegrationTest {
 				.header("Authorization", "Bearer " + accessToken))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.data.analysisStatus").value("COMPLETED"))
-			.andExpect(jsonPath("$.data.title").value("4월 전기요금 고지서"))
+				.andExpect(jsonPath("$.data.title").value("6월 전기요금 고지서"))
 			.andExpect(jsonPath("$.data.summary").value("사용자가 검수한 고지서입니다."))
 			.andExpect(jsonPath("$.data.fields.length()").value(3))
 			.andExpect(jsonPath("$.data.fields[1].key").value("amount"))
 			.andExpect(jsonPath("$.data.fields[1].value").value("80000"))
 			.andExpect(jsonPath("$.data.actions.length()").value(1))
 			.andExpect(jsonPath("$.data.actions[0].actionType").value("REMINDER"))
-			.andExpect(jsonPath("$.data.actions[0].actionDate").value("2026-05-08"))
+				.andExpect(jsonPath("$.data.actions[0].actionDate").value("2026-06-12"))
 			.andExpect(jsonPath("$.data.actions[0].status").value("PENDING"));
 
 		mockMvc.perform(get("/api/actions/upcoming")
@@ -309,7 +309,7 @@ class DocumentUploadIntegrationTest {
 	@Test
 	void completeActionChangesStatusAndRemovesFromUpcoming() throws Exception {
 		String accessToken = signupAndLogin("complete-action@example.com");
-		Long documentId = upload(accessToken, "complete-action.pdf", "Electric bill amount 72300 due 2026-05-10");
+		Long documentId = upload(accessToken, "complete-action.pdf", "Electric bill amount 72300 due 2026-06-15");
 		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
 		reviewBill(accessToken, documentId);
 
@@ -343,7 +343,7 @@ class DocumentUploadIntegrationTest {
 	void completeOtherUsersActionReturnsNotFound() throws Exception {
 		String ownerToken = signupAndLogin("action-owner@example.com");
 		String otherToken = signupAndLogin("action-other@example.com");
-		Long documentId = upload(ownerToken, "owner-action.pdf", "Electric bill amount 72300 due 2026-05-10");
+		Long documentId = upload(ownerToken, "owner-action.pdf", "Electric bill amount 72300 due 2026-06-15");
 		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
 		reviewBill(ownerToken, documentId);
 
@@ -365,7 +365,7 @@ class DocumentUploadIntegrationTest {
 	@Test
 	void deleteDocumentHidesDocumentAndItsUpcomingActions() throws Exception {
 		String accessToken = signupAndLogin("delete@example.com");
-		Long documentId = upload(accessToken, "delete.pdf", "Electric bill amount 72300 due 2026-05-10");
+		Long documentId = upload(accessToken, "delete.pdf", "Electric bill amount 72300 due 2026-06-15");
 		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
 		reviewBill(accessToken, documentId);
 
@@ -439,7 +439,7 @@ class DocumentUploadIntegrationTest {
 	@Test
 	void reanalyzeDocumentClearsReviewDataAndStartsNewAnalysisJob() throws Exception {
 		String accessToken = signupAndLogin("reanalyze@example.com");
-		Long documentId = upload(accessToken, "reanalyze.pdf", "Electric bill amount 72300 due 2026-05-10");
+		Long documentId = upload(accessToken, "reanalyze.pdf", "Electric bill amount 72300 due 2026-06-15");
 		awaitDocumentStatus(documentId, DocumentAnalysisStatus.NEEDS_REVIEW);
 		reviewBill(accessToken, documentId);
 
@@ -463,7 +463,7 @@ class DocumentUploadIntegrationTest {
 			.extracting("fieldKey", "fieldValue")
 			.contains(
 				org.assertj.core.groups.Tuple.tuple("amount", "72300"),
-				org.assertj.core.groups.Tuple.tuple("dueDate", "2026-05-10")
+				org.assertj.core.groups.Tuple.tuple("dueDate", "2026-06-15")
 			);
 		assertThat(documentActionRepository.findByDocumentIdOrderByActionDateAscIdAsc(documentId)).isEmpty();
 		assertThat(analysisJobRepository.countByDocumentId(documentId)).isEqualTo(2);
@@ -623,7 +623,7 @@ class DocumentUploadIntegrationTest {
 					    {
 					      "key": "dueDate",
 					      "label": "납부기한",
-					      "value": "2026-05-10",
+						      "value": "2026-06-15",
 					      "type": "DATE"
 					    }
 					  ]

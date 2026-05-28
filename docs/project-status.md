@@ -63,6 +63,7 @@ Sign up / log in
 - Mobile upcoming action list
 - Mobile document detail screen
 - Mobile analysis result review screen
+- Mobile web and macOS runner setup
 - Mobile dependency lockfile
 - README, API docs, architecture docs, and ERD
 
@@ -75,6 +76,7 @@ Sign up / log in
 - Async processing uses Spring `@Async`, not a persistent queue.
 - Flutter app still needs stronger empty, loading, and failure states for demo polish.
 - Flutter 3.41.8, Xcode 16.4, and CocoaPods 1.16.2 are configured locally.
+- Local web runs require backend CORS for `localhost` and `127.0.0.1`, which is enabled for development.
 - Android SDK is not configured yet, so Android emulator builds are still pending.
 
 ## Remote Branches Observed
