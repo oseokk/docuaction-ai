@@ -67,6 +67,7 @@ Sign up / log in
 - Mobile dependency lockfile
 - App release checklist
 - Privacy policy draft and terms of service draft
+- Demo script and sample bill PDF
 - Login screen AI/privacy review notice
 - README, API docs, architecture docs, and ERD
 

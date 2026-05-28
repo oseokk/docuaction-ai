@@ -1,0 +1,11 @@
+DocuAction AI Sample Bill
+
+Document Type: Utility Bill
+Issuer: Korea Electric Sample Utility
+Customer: Demo User
+Billing Month: June 2026
+Amount: 80000
+Due Date: 2026-06-15
+
+Please pay the amount by the due date.
+This is fake demo data for portfolio and local testing only.

@@ -150,11 +150,12 @@ This directory is ignored by Git.
 
 See [docs/api.md](docs/api.md).
 
-## Architecture Documentation
+## Documentation
 
 - [Architecture](docs/architecture.md)
 - [ERD](docs/erd.md)
 - [Project Status](docs/project-status.md)
+- [Demo Script](docs/demo-script.md)
 - [App Release Checklist](docs/app-release-checklist.md)
 - [Privacy Policy Draft](docs/privacy-policy-draft.md)
 - [Terms Of Service Draft](docs/terms-of-service-draft.md)
